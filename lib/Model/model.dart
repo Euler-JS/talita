@@ -16,7 +16,7 @@ final movies = <dynamic>[
   },
   {
     'Title': 'Big',
-    'Image':'https://images.moviesanywhere.com/b0fa363f331f67556c771350ad0c3d42/688ee7ed-e823-4e4c-9b42-65aac0673d22.jpg',
+    'Image':'https://i.ibb.co/Q3QJdNZn/La-Casa-de-Papel.webp',
     'Director': 'Direct by Penny Marshall',
     'rating': '4.6',
     'duration': "1h:45m",
@@ -31,7 +31,7 @@ final movies = <dynamic>[
   },
   {
     'Title': 'KEVIN & PERRY',
-    'Image':'https://resizing.flixster.com/-XZAfHZM39UwaGJIFWKAE8fS0ak=/v3/t/assets/p25555_p_v10_aa.jpg'
+    'Image':'https://i.ibb.co/BVff3hcS/vingadores.webp'
         ,
     'Director': 'Direct by Ed Bye',
     'rating': '4.0',

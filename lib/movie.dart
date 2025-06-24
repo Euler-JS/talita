@@ -96,7 +96,7 @@ class _MovieDisplayState extends State<MovieDisplay> {
                                   const SizedBox(
                                     height: 20,
                                   ),
-                                  // For movei title
+                                  // For movie title
                                   Text(
                                     movie['Title'],
                                     style: const TextStyle(
@@ -106,7 +106,7 @@ class _MovieDisplayState extends State<MovieDisplay> {
                                   const SizedBox(
                                     height: 10,
                                   ),
-                                  // for movei director
+                                  // for movie director
                                   Text(
                                     movie['Director'],
                                     style: const TextStyle(
