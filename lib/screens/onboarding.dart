@@ -15,6 +15,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   late Animation<double> _fadeAnimation;
   late Animation<double> _slideAnimation;
   late Animation<double> _floatingAnimation;
+  bool _isLogin = true; 
 
   @override
   void initState() {
@@ -65,6 +66,172 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     super.dispose();
   }
 
+void _showLoginModal() {
+  showDialog(
+    context: context,
+    barrierDismissible: true,
+    builder: (context) => StatefulBuilder(
+      builder: (context, setModalState) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          margin: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1A1A1A),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Toggle LOGIN/SIGN UP
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(25),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => setModalState(() => _isLogin = true),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          decoration: BoxDecoration(
+                            color: _isLogin ? const Color(0xFFE53E3E) : Colors.transparent,
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                          child: Text(
+                            'LOGIN',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: _isLogin ? Colors.white : Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => setModalState(() => _isLogin = false),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          decoration: BoxDecoration(
+                            color: !_isLogin ? const Color(0xFFE53E3E) : Colors.transparent,
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                          child: Text(
+                            'SIGN UP',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: !_isLogin ? Colors.white : Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              const SizedBox(height: 30),
+              
+              // Campos do formulário
+              if (_isLogin) ...[
+                // LOGIN FORM
+                _buildTextField('Enter your email', Icons.email_outlined),
+                const SizedBox(height: 16),
+                _buildTextField('Enter your password', Icons.visibility_off, isPassword: true),
+                const SizedBox(height: 12),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () {},
+                    child: const Text('Forgot Password?', style: TextStyle(color: Colors.grey)),
+                  ),
+                ),
+              ] else ...[
+                // SIGN UP FORM
+                _buildTextField('User Name', Icons.person_outline),
+                const SizedBox(height: 16),
+                _buildTextField('Enter your email', Icons.email_outlined),
+                const SizedBox(height: 16),
+                _buildTextField('Password', Icons.visibility_off, isPassword: true),
+                const SizedBox(height: 16),
+                _buildTextField('Confirm Password', Icons.visibility_off, isPassword: true),
+                const SizedBox(height: 16),
+                _buildTextField('Terms and Services (21 Y/o)', Icons.visibility_off, isPassword: true),
+              ],
+              
+              const SizedBox(height: 20),
+              
+              // Action button
+              Container(
+                width: double.infinity,
+                height: 50,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFE53E3E), Color(0xFFD53F8C)],
+                  ),
+                  borderRadius: BorderRadius.circular(25),
+                ),
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const MovieDisplay()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+                  ),
+                  child: Text(
+                    _isLogin ? 'LOGIN' : 'SIGN UP',
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+              
+              const SizedBox(height: 20),
+              const Text('or with', style: TextStyle(color: Colors.grey)),
+              const SizedBox(height: 16),
+              
+              // Social login buttons
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 50,
+                    height: 50,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF2D2D2D),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.g_mobiledata, color: Colors.white, size: 30),
+                  ),
+                  const SizedBox(width: 20),
+                  Container(
+                    width: 50,
+                    height: 50,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF2D2D2D),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.apple, color: Colors.white, size: 24),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -516,12 +683,13 @@ class _OnboardingScreenState extends State<OnboardingScreen>
           borderRadius: BorderRadius.circular(28),
           onTap: () {
             // Navegar para a próxima tela
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const MovieDisplay(),
-              ),
-            );
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(
+            //     builder: (context) => const MovieDisplay(),
+            //   ),
+            // );
+            _showLoginModal();
           },
           child: const Center(
             child: Text(
@@ -538,4 +706,26 @@ class _OnboardingScreenState extends State<OnboardingScreen>
       ),
     );
   }
+
+  Widget _buildTextField(String hint, IconData icon, {bool isPassword = false}) {
+  return Container(
+    decoration: BoxDecoration(
+      color: const Color(0xFF2D2D2D),
+      borderRadius: BorderRadius.circular(25),
+    ),
+    child: TextField(
+      obscureText: isPassword,
+      style: const TextStyle(color: Colors.white),
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: const TextStyle(color: Colors.grey),
+        border: InputBorder.none,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+        suffixIcon: Icon(icon, color: Colors.grey),
+      ),
+    ),
+  );
+}
+
+
 }
