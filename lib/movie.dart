@@ -311,24 +311,31 @@ class _MovieDisplayState extends State<MovieDisplay> {
                     items: movies.map((movie) {
                       return Builder(
                         builder: (BuildContext context) {
-                          return GestureDetector(
-    
-                            onTap: () => _navigateToDetails(movie),
-                            child: Padding(
-                              padding: EdgeInsets.all(config.padding),
-                              child: Container(
-                                width: MediaQuery.of(context).size.width,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(20),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
-                                      blurRadius: 10,
-                                      offset: const Offset(0, 5),
-                                    ),
-                                  ],
-                                ),
+                          final movieIndex = movies.indexOf(movie);
+                          final isHovered = hoverStates[movieIndex] ?? false;
+                           return MouseRegion(
+                              onEnter: (_) => setState(() => hoverStates[movieIndex] = true),
+                              onExit: (_) => setState(() => hoverStates[movieIndex] = false),
+                             child: GestureDetector(
+            onTap: () => _navigateToDetails(movie),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              transform: Matrix4.identity()..scale(isHovered ? 1.02 : 1.0),
+              child: Padding(
+                padding: EdgeInsets.all(config.padding),
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(isHovered ? 0.2 : 0.1),
+                        blurRadius: isHovered ? 15 : 10,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                  ),
                                 child: SingleChildScrollView(
                                   child: Column(
                                     children: [
@@ -474,7 +481,7 @@ class _MovieDisplayState extends State<MovieDisplay> {
                                 ),
                               ),
                             ),
-                          );
+            )));
                         },
                       );
                     }).toList(),
