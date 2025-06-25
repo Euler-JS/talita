@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:movie_app_ui/movie.dart';
+import 'package:movie_app_ui/screens/onboarding.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,7 +14,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return  const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: MovieDisplay(),
+      // home: MovieDisplay(),
+      home: OnboardingScreen(),
     );
   }
 }
