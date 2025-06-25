@@ -247,77 +247,81 @@ void _showLoginModal() {
             ],
           ),
         ),
-       child: SafeArea(
-  child: SingleChildScrollView(
-    child: Column(
-      children: [
-        // Estrelas no fundo
-        SizedBox(
-          height: MediaQuery.of(context).size.height * 0.6,
-          child: Stack(
-            children: [
-              _buildStars(),
-              _buildCentralIllustration(),
-            ],
+       child: Container(
+        width: double.infinity,
+              height: double.infinity,
+         child: SafeArea(
+           child: SingleChildScrollView(
+             child: Column(
+               children: [
+          // Estrelas no fundo
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.6,
+            child: Stack(
+              children: [
+                _buildStars(),
+                _buildCentralIllustration(),
+              ],
+            ),
           ),
-        ),
-
-        // Texto e botão
-        AnimatedBuilder(
-          animation: _slideAnimation,
-          builder: (context, child) {
-            return Transform.translate(
-              offset: Offset(0, _slideAnimation.value),
-              child: FadeTransition(
-                opacity: _fadeAnimation,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 40),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text(
-                        'ISOMETRIC\nCINEMA\nILLUSTRATION',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 2,
-                          height: 1.2,
+         
+          // Texto e botão
+          AnimatedBuilder(
+            animation: _slideAnimation,
+            builder: (context, child) {
+              return Transform.translate(
+                offset: Offset(0, _slideAnimation.value),
+                child: FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 40),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text(
+                          'TALITA',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.redAccent,
+                            fontSize: 40,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 6,
+                            height: 1.2,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 40),
-                      const Text(
-                        'Chat, React & Enjoy!',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.w600,
+                        const SizedBox(height: 40),
+                        const Text(
+                          'TEATRO,JOGOS, SHOWS...!',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      const Text(
-                        'Engage with friends in real-time while\nwatching movies. Send reactions, chat\nlive, and even grab virtual snacks!',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 16,
-                          height: 1.5,
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Compre Bilhetes de forma fácil e rápida... E reserve o teu lugar!',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 16,
+                            height: 1.5,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 40),
-                      _buildStartButton(),
-                    ],
+                        const SizedBox(height: 40),
+                        _buildStartButton(),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            );
-          },
-        ),
-      ],
-    ),
-  ),
-),
+              );
+            },
+          ),
+               ],
+             ),
+           ),
+         ),
+       ),
 
       ),
     );
