@@ -16,6 +16,8 @@ class MovieDisplay extends StatefulWidget {
 int current = 0;
 
 class _MovieDisplayState extends State<MovieDisplay> {
+  Map<int, bool> hoverStates = {}; // Para controlar hover de cada card
+  bool isLoading = false;
   // Função para determinar o tipo de dispositivo baseado na largura
   DeviceType getDeviceType(double width) {
     if (width < 600) {
@@ -391,7 +393,28 @@ class _MovieDisplayState extends State<MovieDisplay> {
                 ),
               ),
             ),
+            Positioned(
+              bottom: config.bottomPosition + config.cardHeight + 20,
+              left: 0,
+              right: 0,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: movies.asMap().entries.map((entry) {
+                  return AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    width: current == entry.key ? 12 : 8,
+                    height: 8,
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(4),
+                      color: current == entry.key ? const Color.fromARGB(255, 18, 17, 17) : Colors.white.withOpacity(0.5),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
           ],
+          
         ),
       ),
     );
