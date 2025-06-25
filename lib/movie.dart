@@ -524,4 +524,4 @@ class ResponsiveConfig {
   });
 }
 
-// Página de detalhes do evento (colocar em arquivo separado)
+
