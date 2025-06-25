@@ -246,6 +246,37 @@ class _MovieDisplayState extends State<MovieDisplay> {
               ),
             ),
 
+            Positioned(
+              top: MediaQuery.of(context).padding.top + 20,
+              left: 0,
+              right: 0,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Row(
+                  children: [
+                    IconButton(
+                      onPressed: () {},
+                      icon: const Icon(Icons.menu, color: Colors.white),
+                    ),
+                    const Expanded(
+                      child: Text(
+                        "Movies & Shows",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {}, // Adicionar ação de busca
+                      icon: const Icon(Icons.search, color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
+            ),
             // Carousel responsivo
             Positioned(
               bottom: config.bottomPosition,
@@ -264,7 +295,16 @@ class _MovieDisplayState extends State<MovieDisplay> {
                       enlargeFactor: deviceType == DeviceType.desktop ? 0.2 : 0.3,
                       onPageChanged: (index, reason) {
                         setState(() {
+                          isLoading = true;
                           current = index;
+                        });
+
+                         Future.delayed(const Duration(milliseconds: 300), () {
+                          if (mounted) {
+                            setState(() {
+                              isLoading = false;
+                            });
+                          }
                         });
                       },
                     ),
@@ -293,6 +333,7 @@ class _MovieDisplayState extends State<MovieDisplay> {
                                   child: Column(
                                     children: [
                                       // Movie poster
+                                     
                                       Container(
                                         height: config.imageHeight,
                                         width: MediaQuery.of(context).size.width * config.imageWidth,
@@ -308,22 +349,53 @@ class _MovieDisplayState extends State<MovieDisplay> {
                                             ),
                                           ],
                                         ),
-                                        child: Image.network(
-                                          movie['Image'],
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (context, error, stackTrace) {
-                                            return Container(
-                                              color: Colors.grey[300],
-                                              child: const Icon(
-                                                Icons.movie,
-                                                size: 50,
-                                                color: Colors.grey,
+                                        child: Stack(
+                                          children: [
+                                            Image.network(
+                                              movie['Image'],
+                                              fit: BoxFit.cover,
+                                              width: double.infinity,
+                                              height: double.infinity,
+                                              loadingBuilder: (context, child, loadingProgress) {
+                                                if (loadingProgress == null) return child;
+                                                return Container(
+                                                  color: Colors.grey[300],
+                                                  child: Center(
+                                                    child: CircularProgressIndicator(
+                                                      color: Colors.red,
+                                                      value: loadingProgress.expectedTotalBytes != null
+                                                          ? loadingProgress.cumulativeBytesLoaded /
+                                                              loadingProgress.expectedTotalBytes!
+                                                          : null,
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              errorBuilder: (context, error, stackTrace) {
+                                                return Container(
+                                                  color: Colors.grey[300],
+                                                  child: const Icon(
+                                                    Icons.movie,
+                                                    size: 50,
+                                                    color: Colors.grey,
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                            // OVERLAY DE LOADING GERAL:
+                                            if (isLoading && current == movies.indexOf(movie))
+                                              Container(
+                                                color: Colors.black.withOpacity(0.3),
+                                                child: const Center(
+                                                  child: CircularProgressIndicator(
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
                                               ),
-                                            );
-                                          },
+                                          ],
                                         ),
                                       ),
-                                      
+
                                       SizedBox(height: deviceType == DeviceType.desktop ? 25 : 20),
                                       
                                       // Movie title
@@ -353,8 +425,8 @@ class _MovieDisplayState extends State<MovieDisplay> {
                                         child: Text(
                                           movie['Director'],
                                           style: TextStyle(
-                                            fontSize: config.directorFontSize,
-                                            color: Colors.black54,
+                                            color: Colors.black87, // MUDANÇA: era Colors.black54
+                                            fontWeight: FontWeight.w500,
                                           ),
                                           textAlign: TextAlign.center,
                                           maxLines: 1,
@@ -363,6 +435,23 @@ class _MovieDisplayState extends State<MovieDisplay> {
                                       ),
                                       
                                       SizedBox(height: deviceType == DeviceType.desktop ? 25 : 20),
+
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                        decoration: BoxDecoration(
+                                          color: Colors.red.withOpacity(0.1),
+                                          borderRadius: BorderRadius.circular(12),
+                                          border: Border.all(color: Colors.red.withOpacity(0.3)),
+                                        ),
+                                        child: Text(
+                                          "Action • Adventure", // ou movie['genre'] se existir
+                                          style: TextStyle(
+                                            color: Colors.red,
+                                            fontSize: config.detailsFontSize - 2,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ),
                                       
                                       // Movie details (rating, duration, watch)
                                       AnimatedOpacity(
@@ -494,26 +583,35 @@ class _MovieDisplayState extends State<MovieDisplay> {
     );
   }
 
-  Widget _buildWatchButton(double fontSize) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(
-          Icons.play_circle,
-          color: Colors.black87,
-          size: fontSize + 5,
+Widget _buildWatchButton(double fontSize) {
+    return ElevatedButton(
+      onPressed: () {}, // Adicionar ação específica aqui
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.red,
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
         ),
-        const SizedBox(width: 5),
-        Text(
-          "Watch",
-          style: TextStyle(
-            fontSize: fontSize,
-            color: Colors.black54,
-            fontWeight: FontWeight.w500,
+        elevation: 2,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Icon(
+          //   Icons.play_arrow,
+          //   size: fontSize + 2,
+          // ),
+          // const SizedBox(width: 4),
+          Text(
+            "Buy Ticket",
+            style: TextStyle(
+              fontSize: fontSize - 1,
+              fontWeight: FontWeight.w600,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
