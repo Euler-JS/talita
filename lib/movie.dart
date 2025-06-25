@@ -1,10 +1,8 @@
+import 'dart:ui';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:movie_app_ui/Model/model.dart';
 import 'package:movie_app_ui/event_details.dart';
-
-// Importe a página de detalhes aqui
-// import 'event_details_page.dart';
 
 class MovieDisplay extends StatefulWidget {
   const MovieDisplay({super.key});
@@ -16,9 +14,9 @@ class MovieDisplay extends StatefulWidget {
 int current = 0;
 
 class _MovieDisplayState extends State<MovieDisplay> {
-  Map<int, bool> hoverStates = {}; // Para controlar hover de cada card
+  Map<int, bool> hoverStates = {};
   bool isLoading = false;
-  // Função para determinar o tipo de dispositivo baseado na largura
+
   DeviceType getDeviceType(double width) {
     if (width < 600) {
       return DeviceType.mobile;
@@ -29,164 +27,192 @@ class _MovieDisplayState extends State<MovieDisplay> {
     }
   }
 
-  // Função para obter configurações responsivas
   ResponsiveConfig getResponsiveConfig(DeviceType deviceType) {
     switch (deviceType) {
       case DeviceType.mobile:
         return ResponsiveConfig(
           viewportFraction: 0.7,
-          cardHeight: 550,
-          imageHeight: 300,
+          cardHeight: 580,
+          imageHeight: 280,
           imageWidth: 0.5,
-          titleFontSize: 18,
-          directorFontSize: 14,
-          detailsFontSize: 13,
-          padding: 8.0,
-          bottomPosition: 5,
+          titleFontSize: 20,
+          directorFontSize: 15,
+          detailsFontSize: 14,
+          padding: 12.0,
+          bottomPosition: 20,
           stackHeight: 0.7,
         );
       case DeviceType.tablet:
         return ResponsiveConfig(
           viewportFraction: 0.5,
-          cardHeight: 650,
-          imageHeight: 400,
+          cardHeight: 680,
+          imageHeight: 380,
           imageWidth: 0.6,
-          titleFontSize: 22,
-          directorFontSize: 16,
-          detailsFontSize: 15,
-          padding: 12.0,
-          bottomPosition: 20,
+          titleFontSize: 24,
+          directorFontSize: 17,
+          detailsFontSize: 16,
+          padding: 16.0,
+          bottomPosition: 30,
           stackHeight: 0.75,
         );
       case DeviceType.desktop:
         return ResponsiveConfig(
           viewportFraction: 0.35,
-          cardHeight: 750,
-          imageHeight: 450,
+          cardHeight: 780,
+          imageHeight: 420,
           imageWidth: 0.7,
-          titleFontSize: 24,
-          directorFontSize: 18,
-          detailsFontSize: 16,
-          padding: 16.0,
-          bottomPosition: 40,
+          titleFontSize: 26,
+          directorFontSize: 19,
+          detailsFontSize: 17,
+          padding: 20.0,
+          bottomPosition: 50,
           stackHeight: 0.8,
         );
     }
   }
 
-  // Função para navegar para a página de detalhes
   void _navigateToDetails(Map<String, dynamic> movie) {
-    // Preparar dados extras para a página de detalhes
     final eventData = {
       ...movie,
-      'type': 'movie', // ou 'sports', 'concert', etc.
+      'type': 'movie',
       'year': '2024',
       'genre': 'Action / Adventure',
       'description': 'After the death of his father, T\'Challa returns home to the African nation of Wakanda to take his rightful place as king. However, when a powerful enemy suddenly reappears, T\'Challa\'s mettle as king—and as Black Panther—gets tested when he\'s drawn into a conflict that puts the fate of Wakanda and the entire world at risk.',
     };
 
-    // Navegação para a página de detalhes
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => EventDetailsPage(eventData: eventData),
       ),
     );
-    
-    // Por enquanto, apenas mostra um dialog
   }
 
- void _showDetailsDialog(Map<String, dynamic> movie) {
-  showDialog(
-    context: context,
-    builder: (context) => Dialog(
-      backgroundColor: Colors.transparent,
-      child: Container(
-        constraints: const BoxConstraints(maxWidth: 320),
-        child: AlertDialog(
-          backgroundColor: Colors.grey[900],
-          contentPadding: const EdgeInsets.all(16),
-          title: Text(
-            movie['Title'],
-            style: const TextStyle(color: Colors.white),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+  void _showDetailsDialog(Map<String, dynamic> movie) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 340),
+          child: AlertDialog(
+            backgroundColor: const Color(0xFF1A1A1A),
+            contentPadding: const EdgeInsets.all(20),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+            title: Text(
+              movie['Title'],
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+                fontSize: 20,
+              ),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  height: 220,
+                  width: 300,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    color: Colors.grey[800],
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.3),
+                        blurRadius: 12,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  clipBehavior: Clip.hardEdge,
+                  child: Image.network(
+                    movie['Image'],
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        color: Colors.grey[800],
+                        child: const Icon(Icons.movie, color: Colors.grey, size: 50),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  movie['Director'],
+                  style: TextStyle(
+                    color: Colors.grey[400],
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Icon(Icons.star, color: Colors.amber, size: 18),
+                    const SizedBox(width: 6),
+                    Text(
+                      movie['rating'],
+                      style: const TextStyle(color: Colors.white, fontSize: 15),
+                    ),
+                    const SizedBox(width: 20),
+                    Icon(Icons.access_time, color: Colors.grey[400], size: 18),
+                    const SizedBox(width: 6),
+                    Text(
+                      movie['duration'],
+                      style: const TextStyle(color: Colors.white, fontSize: 15),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  'Click "View Details" to see the full page with tickets, cast, reviews and more information.',
+                  style: TextStyle(
+                    color: Colors.grey[500],
+                    fontSize: 13,
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(
+                  'Close',
+                  style: TextStyle(color: Colors.grey[400], fontSize: 15),
+                ),
+              ),
               Container(
-                height: 200,
-                width: 280,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  color: Colors.grey[800],
-                ),
-                clipBehavior: Clip.hardEdge,
-                child: Image.network(
-                  movie['Image'],
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      color: Colors.grey[800],
-                      child: const Icon(Icons.movie, color: Colors.grey, size: 50),
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                movie['Director'],
-                style: const TextStyle(color: Colors.grey, fontSize: 14),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Icon(Icons.star, color: Colors.amber, size: 16),
-                  const SizedBox(width: 4),
-                  Text(
-                    movie['rating'],
-                    style: const TextStyle(color: Colors.white),
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFE53E3E), Color(0xFFD53F8C)],
                   ),
-                  const SizedBox(width: 16),
-                  Icon(Icons.access_time, color: Colors.grey, size: 16),
-                  const SizedBox(width: 4),
-                  Text(
-                    movie['duration'],
-                    style: const TextStyle(color: Colors.white),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: ElevatedButton(
+                  onPressed: () => _navigateToDetails(movie),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Click "View Details" to see the full page with tickets, cast, reviews and more information.',
-                style: TextStyle(color: Colors.grey, fontSize: 12),
+                  child: const Text(
+                    'View Details',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 15,
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Close', style: TextStyle(color: Colors.grey)),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                _navigateToDetails(movie);
-                // Navigator.pop(context);
-                // ScaffoldMessenger.of(context).showSnackBar(
-                //   const SnackBar(
-                //     content: Text('Página de detalhes em desenvolvimento...'),
-                //     backgroundColor: Colors.red,
-                //   ),
-                // );
-              },
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-              child: const Text('View Details', style: TextStyle(color: Colors.white)),
-            ),
-          ],
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -200,10 +226,17 @@ class _MovieDisplayState extends State<MovieDisplay> {
         height: screenHeight,
         child: Stack(
           children: [
-            // Background image com melhor responsividade
+            // Enhanced background with blur effect
             Container(
               width: double.infinity,
               height: double.infinity,
+              child: Stack(
+                children: [
+                  
+                  Container(
+              width: double.infinity,
+              height: double.infinity,
+              
               child: Image.network(
                 movies[current]['Image'],
                 fit: BoxFit.cover,
@@ -219,9 +252,22 @@ class _MovieDisplayState extends State<MovieDisplay> {
                 },
               ),
             ),
+                  // Backdrop blur effect
+                  // Container(
+                  //   decoration: BoxDecoration(
+                  //     color: Colors.black.withOpacity(0.1),
+                  //   ),
+                  //   child: BackdropFilter(
+                  //     filter: ImageFilter.blur(sigmaX: 1.5, sigmaY: 1.5),
+                  //     child: Container(color: Colors.transparent),
+                  //   ),
+                  // ),
+                ],
+              ),
+            ),
             
-            // Gradient overlay responsivo
-            Positioned(
+            // Enhanced gradient overlay
+             Positioned(
               top: 0,
               left: 0,
               right: 0,
@@ -232,52 +278,62 @@ class _MovieDisplayState extends State<MovieDisplay> {
                     begin: Alignment.bottomCenter,
                     end: Alignment.topCenter,
                     colors: [
-                      Colors.grey.shade50.withOpacity(1),
-                      Colors.grey.shade50.withOpacity(1),
-                      Colors.grey.shade50.withOpacity(0.9),
-                      Colors.grey.shade100.withOpacity(0.7),
-                      Colors.grey.shade100.withOpacity(0.3),
-                      Colors.grey.shade100.withOpacity(0.1),
-                      Colors.grey.shade100.withOpacity(0.0),
-                      Colors.grey.shade100.withOpacity(0.0),
+                     Colors.grey.shade900.withOpacity(1),
+          Colors.grey.shade900.withOpacity(1),
+          Colors.grey.shade900.withOpacity(0.9),
+          Colors.grey.shade800.withOpacity(0.7),
+          Colors.grey.shade800.withOpacity(0.3),
+          Colors.grey.shade800.withOpacity(0.1),
+          Colors.grey.shade800.withOpacity(0.0),
+          Colors.grey.shade800.withOpacity(0.0),
                     ],
                   ),
                 ),
               ),
             ),
 
+            // Enhanced header with better contrast
             Positioned(
               top: MediaQuery.of(context).padding.top + 20,
               left: 0,
               right: 0,
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Row(
-                  children: [
-                    IconButton(
-                      onPressed: () {},
-                      icon: const Icon(Icons.menu, color: Colors.white),
-                    ),
-                    const Expanded(
-                      child: Text(
-                        "Movies & Shows",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.center,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        onPressed: () {},
+                        icon: const Icon(Icons.menu, color: Colors.white, size: 26),
                       ),
-                    ),
-                    IconButton(
-                      onPressed: () {}, // Adicionar ação de busca
-                      icon: const Icon(Icons.search, color: Colors.white),
-                    ),
-                  ],
+                      const Expanded(
+                        child: Text(
+                          "Movies & Shows",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 26,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.5,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {},
+                        icon: const Icon(Icons.search, color: Colors.white, size: 26),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-            // Carousel responsivo
+
+            // Enhanced carousel
             Positioned(
               bottom: config.bottomPosition,
               height: screenHeight * config.stackHeight,
@@ -489,21 +545,33 @@ class _MovieDisplayState extends State<MovieDisplay> {
                 ),
               ),
             ),
+
             Positioned(
-              bottom: config.bottomPosition + config.cardHeight + 20,
+              bottom: config.bottomPosition + config.cardHeight + 40,
               left: 0,
               right: 0,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: movies.asMap().entries.map((entry) {
+                  final isActive = current == entry.key;
                   return AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    width: current == entry.key ? 12 : 8,
-                    height: 8,
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    duration: const Duration(milliseconds: 400),
+                    curve: Curves.easeOutCubic,
+                    width: isActive ? 24 : 12,
+                    height: 12,
+                    margin: const EdgeInsets.symmetric(horizontal: 6),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(4),
-                      color: current == entry.key ? const Color.fromARGB(255, 18, 17, 17) : Colors.white.withOpacity(0.5),
+                      borderRadius: BorderRadius.circular(6),
+                      color: isActive 
+                          ? Colors.white
+                          : Colors.white.withOpacity(0.4),
+                      boxShadow: isActive ? [
+                        BoxShadow(
+                          color: Colors.white.withOpacity(0.4),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ] : null,
                     ),
                   );
                 }).toList(),
@@ -515,8 +583,6 @@ class _MovieDisplayState extends State<MovieDisplay> {
       ),
     );
   }
-
-  // Layout para desktop (mais espaçado)
   Widget _buildDesktopDetails(Map<String, dynamic> movie, ResponsiveConfig config) {
     return Column(
       children: [
@@ -532,18 +598,17 @@ class _MovieDisplayState extends State<MovieDisplay> {
             _buildDetailItem(
               Icons.access_time,
               movie['duration'],
-              Colors.black54,
+              Colors.grey[600]!,
               config.detailsFontSize,
             ),
           ],
         ),
-        const SizedBox(height: 15),
+        const SizedBox(height: 20),
         _buildWatchButton(config.detailsFontSize),
       ],
     );
   }
 
-  // Layout para mobile e tablet (em linha)
   Widget _buildMobileTabletDetails(Map<String, dynamic> movie, ResponsiveConfig config, DeviceType deviceType) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -557,7 +622,7 @@ class _MovieDisplayState extends State<MovieDisplay> {
         _buildDetailItem(
           Icons.access_time,
           movie['duration'],
-          Colors.black54,
+          Colors.grey[600]!,
           config.detailsFontSize,
         ),
         _buildWatchSection(config.detailsFontSize, deviceType),
@@ -569,14 +634,15 @@ class _MovieDisplayState extends State<MovieDisplay> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, color: iconColor, size: fontSize + 5),
-        const SizedBox(width: 5),
+        Icon(icon, color: iconColor, size: fontSize + 6),
+        const SizedBox(width: 6),
         Text(
           text,
           style: TextStyle(
             fontSize: fontSize,
-            color: Colors.black54,
-            fontWeight: FontWeight.w500,
+            color: Colors.grey[700],
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.2,
           ),
         ),
       ],
@@ -585,45 +651,51 @@ class _MovieDisplayState extends State<MovieDisplay> {
 
   Widget _buildWatchSection(double fontSize, DeviceType deviceType) {
     return SizedBox(
-      width: deviceType == DeviceType.desktop ? 100 : 80,
+      width: deviceType == DeviceType.desktop ? 120 : 100,
       child: _buildWatchButton(fontSize),
     );
   }
 
-Widget _buildWatchButton(double fontSize) {
-    return ElevatedButton(
-      onPressed: () {}, // Adicionar ação específica aqui
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.red,
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+  Widget _buildWatchButton(double fontSize) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFFE53E3E), Color(0xFFD53F8C)],
         ),
-        elevation: 2,
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Icon(
-          //   Icons.play_arrow,
-          //   size: fontSize + 2,
-          // ),
-          // const SizedBox(width: 4),
-          Text(
-            "Buy Ticket",
-            style: TextStyle(
-              fontSize: fontSize - 1,
-              fontWeight: FontWeight.w600,
-            ),
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFE53E3E).withOpacity(0.4),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
           ),
         ],
+      ),
+      child: ElevatedButton(
+        onPressed: () {},
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
+        ),
+        child: Text(
+          "Buy Ticket",
+          style: TextStyle(
+            fontSize: fontSize,
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
+            letterSpacing: 0.3,
+          ),
+        ),
       ),
     );
   }
 }
 
-// Enums e classes para configuração responsiva
+// Enhanced responsive configuration
 enum DeviceType { mobile, tablet, desktop }
 
 class ResponsiveConfig {
@@ -651,5 +723,3 @@ class ResponsiveConfig {
     required this.stackHeight,
   });
 }
-
-
