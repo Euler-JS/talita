@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'dart:ui';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class EventDetailsPage extends StatefulWidget {
   final Map<String, dynamic> eventData;
@@ -500,8 +501,14 @@ class _TicketPurchaseFormState extends State<TicketPurchaseForm>
   }
 
   Future<Map<String, dynamic>> _createBooking() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userDataString = await prefs.getString('user_data');
+    final userData = jsonDecode(userDataString!);
+    
+
     final bookingData = {
       'event_id': widget.eventData['id'],
+      'user_id': userData['id'],
       'quantity': _ticketQuantity,
       'customer_notes': _notesController.text.trim().isNotEmpty 
           ? _notesController.text.trim() 
@@ -966,7 +973,7 @@ class _TicketPurchaseFormState extends State<TicketPurchaseForm>
 
 
 
- void _handlePurchase() async {
+void _handlePurchase() async {
   if (!_formKey.currentState!.validate()) return;
 
   // Verificar se temos ID do evento
@@ -996,18 +1003,21 @@ class _TicketPurchaseFormState extends State<TicketPurchaseForm>
 
   try {
     final result = await _createBooking();
-    
+
+    if (!mounted) return;
+
+    // Mostra o diálogo de sucesso primeiro e aguarda o botão "OK"
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => _buildSuccessDialog(result),
+    );
+
+    // Depois que o usuário fecha o diálogo, volta para a tela anterior
     if (mounted) {
       Navigator.pop(context);
-      
-      // Mostrar dialog de sucesso com detalhes da reserva
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => _buildSuccessDialog(result),
-      );
     }
-    
+
   } catch (e) {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1035,6 +1045,7 @@ class _TicketPurchaseFormState extends State<TicketPurchaseForm>
     }
   }
 }
+
 
 // ADICIONAR este método para o dialog de sucesso:
 Widget _buildSuccessDialog(Map<String, dynamic> booking) {
