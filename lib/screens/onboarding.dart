@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
 
@@ -152,14 +153,7 @@ Future<void> _login() async {
       // Sucesso - salvar dados do usuário (opcional)
       // Você pode usar SharedPreferences ou apenas manter em memória
       
-      // Fechar modal e navegar
-      Navigator.pop(context);
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const MovieDisplay()),
-      );
-      
-      // Mostrar mensagem de sucesso
+        // Mostrar mensagem de sucesso
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Login realizado com sucesso!')),
       );
@@ -167,6 +161,15 @@ Future<void> _login() async {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('user_data', json.encode(data['user']));
       await prefs.setBool('is_logged_in', true);
+
+      // Fechar modal e navegar
+      Navigator.pop(context);
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const MovieDisplay()),
+      );
+      
+    
     } else {
       final error = json.decode(response.body);
       setState(() {
