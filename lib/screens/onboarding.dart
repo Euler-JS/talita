@@ -205,66 +205,127 @@ void _showLoginModal() {
       builder: (context, setModalState) => Dialog(
         backgroundColor: Colors.transparent,
         child: Container(
-          margin: const EdgeInsets.all(20),
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: const Color(0xFF1A1A1A),
-            borderRadius: BorderRadius.circular(20),
-          ),
+  margin: const EdgeInsets.all(20),
+  padding: const EdgeInsets.all(28),
+  decoration: BoxDecoration(
+    gradient: const LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [
+        Color(0xFF2D1B3D),
+        Color(0xFF1A0D26),
+        Color(0xFF0F0515),
+      ],
+    ),
+    borderRadius: BorderRadius.circular(24),
+    border: Border.all(
+      color: Colors.pink.withOpacity(0.3),
+      width: 1,
+    ),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.pink.withOpacity(0.2),
+        blurRadius: 20,
+        spreadRadius: 2,
+        offset: const Offset(0, 8),
+      ),
+      BoxShadow(
+        color: Colors.black.withOpacity(0.5),
+        blurRadius: 30,
+        spreadRadius: -5,
+        offset: const Offset(0, 15),
+      ),
+    ],
+  ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               // Toggle LOGIN/SIGN UP
               Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(25),
+  decoration: BoxDecoration(
+    gradient: LinearGradient(
+      colors: [Colors.white.withOpacity(0.9), Colors.white.withOpacity(0.7)],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    ),
+    borderRadius: BorderRadius.circular(30),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black.withOpacity(0.1),
+        blurRadius: 8,
+        offset: const Offset(0, 4),
+      ),
+    ],
+  ),
+  child: Row(
+    children: [
+      Expanded(
+        child: GestureDetector(
+          onTap: (){ setModalState(() => _isLogin = true); _clearFields();},
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            decoration: BoxDecoration(
+              gradient: _isLogin ? const LinearGradient(
+                colors: [Color(0xFFFF6B9D), Color(0xFFE91E63)],
+              ) : null,
+              borderRadius: BorderRadius.circular(30),
+              boxShadow: _isLogin ? [
+                BoxShadow(
+                  color: const Color(0xFFE91E63).withOpacity(0.4),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
                 ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: (){ setModalState(() => _isLogin = true); _clearFields();},
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          decoration: BoxDecoration(
-                            color: _isLogin ? const Color(0xFFE53E3E) : Colors.transparent,
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                          child: Text(
-                            'LOGIN',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: _isLogin ? Colors.white : Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {setModalState(() => _isLogin = false); _clearFields();},
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          decoration: BoxDecoration(
-                            color: !_isLogin ? const Color(0xFFE53E3E) : Colors.transparent,
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                          child: Text(
-                            'SIGN UP',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: !_isLogin ? Colors.white : Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+              ] : null,
+            ),
+            child: Text(
+              'LOGIN',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: _isLogin ? Colors.white : Colors.black87,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
               ),
+            ),
+          ),
+        ),
+      ),
+      Expanded(
+        child: GestureDetector(
+          onTap: () {setModalState(() => _isLogin = false); _clearFields();},
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            decoration: BoxDecoration(
+              gradient: !_isLogin ? const LinearGradient(
+                colors: [Color(0xFFFF6B9D), Color(0xFFE91E63)],
+              ) : null,
+              borderRadius: BorderRadius.circular(30),
+              boxShadow: !_isLogin ? [
+                BoxShadow(
+                  color: const Color(0xFFE91E63).withOpacity(0.4),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ] : null,
+            ),
+            child: Text(
+              'SIGN UP',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: !_isLogin ? Colors.white : Colors.black87,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+          ),
+        ),
+      ),
+    ],
+  ),
+),
               
               const SizedBox(height: 30),
               
@@ -296,42 +357,98 @@ void _showLoginModal() {
               ],
               
               const SizedBox(height: 20),
-              
+              if (_errorMessage != null) ...[
+  const SizedBox(height: 12),
+  Container(
+    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    decoration: BoxDecoration(
+      color: Colors.red.withOpacity(0.1),
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(color: Colors.red.withOpacity(0.3)),
+    ),
+    child: Row(
+      children: [
+        Icon(Icons.error_outline, color: Colors.red.shade300, size: 20),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            _errorMessage!,
+            style: TextStyle(
+              color: Colors.red.shade300,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+      ],
+    ),
+  ),
+],
               // Action button
-              Container(
-                width: double.infinity,
-                height: 50,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFFE53E3E), Color(0xFFD53F8C)],
-                  ),
-                  borderRadius: BorderRadius.circular(25),
-                ),
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null :() {
-                    if (_isLogin) {
-                      _login();
-                    } else {
-                      _signUp();
-                    }
-                    // Navigator.pop(context);
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(builder: (context) => const MovieDisplay()),
-                    // );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    shadowColor: Colors.transparent,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-                  ),
-                  child: Text(
-                    _isLogin ? 'LOGIN' : 'SIGN UP',
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
               
+Container(
+  width: double.infinity,
+  height: 54,
+  decoration: BoxDecoration(
+    gradient: const LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [
+        Color(0xFFFF6B9D),
+        Color(0xFFE91E63),
+        Color(0xFFD81B60),
+      ],
+    ),
+    borderRadius: BorderRadius.circular(27),
+    boxShadow: [
+      BoxShadow(
+        color: const Color(0xFFE91E63).withOpacity(0.4),
+        blurRadius: 12,
+        spreadRadius: 1,
+        offset: const Offset(0, 6),
+      ),
+      BoxShadow(
+        color: Colors.black.withOpacity(0.2),
+        blurRadius: 8,
+        offset: const Offset(0, 4),
+      ),
+    ],
+  ),
+  child: ElevatedButton(
+    onPressed: _isLoading ? null : () {
+      if (_isLogin) {
+        _login();
+      } else {
+        _signUp();
+      }
+    },
+    style: ElevatedButton.styleFrom(
+      backgroundColor: Colors.transparent,
+      shadowColor: Colors.transparent,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(27)),
+      elevation: 0,
+    ),
+    child: _isLoading 
+      ? const SizedBox(
+          width: 24,
+          height: 24,
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            strokeWidth: 2,
+          ),
+        )
+      : Text(
+          _isLogin ? 'LOGIN' : 'SIGN UP',
+          style: const TextStyle(
+            color: Colors.white, 
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            letterSpacing: 1,
+          ),
+        ),
+  ),
+),
+
               const SizedBox(height: 20),
               const Text('or with', style: TextStyle(color: Colors.grey)),
               const SizedBox(height: 16),
@@ -849,22 +966,64 @@ void _showLoginModal() {
     );
   }
 
-  Widget _buildTextField(String hint, IconData icon, {bool isPassword = false, TextEditingController? controller}) {
+Widget _buildTextField(String hint, IconData icon, {bool isPassword = false, TextEditingController? controller}) {
   return Container(
     decoration: BoxDecoration(
-      color: const Color(0xFF2D2D2D),
-      borderRadius: BorderRadius.circular(25),
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          const Color(0xFF2D2D2D).withOpacity(0.8),
+          const Color(0xFF1A1A1A).withOpacity(0.9),
+        ],
+      ),
+      borderRadius: BorderRadius.circular(16),
+      border: Border.all(
+        color: Colors.pink.withOpacity(0.2),
+        width: 1,
+      ),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.2),
+          blurRadius: 8,
+          offset: const Offset(0, 4),
+        ),
+        BoxShadow(
+          color: Colors.pink.withOpacity(0.05),
+          blurRadius: 12,
+          spreadRadius: 1,
+          offset: const Offset(0, 2),
+        ),
+      ],
     ),
     child: TextField(
       controller: controller,
       obscureText: isPassword,
-      style: const TextStyle(color: Colors.white),
+      style: const TextStyle(
+        color: Colors.white,
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
+      ),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: const TextStyle(color: Colors.grey),
+        hintStyle: TextStyle(
+          color: Colors.grey.withOpacity(0.7),
+          fontSize: 15,
+        ),
         border: InputBorder.none,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-        suffixIcon: Icon(icon, color: Colors.grey),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+        suffixIcon: Container(
+          margin: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.pink.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(
+            icon, 
+            color: Colors.pink.withOpacity(0.7),
+            size: 20,
+          ),
+        ),
       ),
     ),
   );
