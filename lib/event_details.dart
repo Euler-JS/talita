@@ -108,6 +108,11 @@ class _EventDetailsPageState extends State<EventDetailsPage>
     return '$currency $price';
   }
 
+  String _getAvailableTickets() {
+    final availableTickets = widget.eventData['available_tickets']?.toString() ?? '0';
+    return '$availableTickets';
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
@@ -235,8 +240,8 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                             ),
                           ),
                           const SizedBox(width: 8),
-                          const Text(
-                            'On Trending',
+                          Text(
+                            '${_getEventGenre()}',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 13,
@@ -267,9 +272,9 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                     // Rating e informações modernizadas
                     Row(
                       children: [
-                        _buildInfoChip('4K', Icons.video_settings),
+                        _buildInfoChip(_getPrice(), Icons.money),
                         const SizedBox(width: 12),
-                        _buildInfoChip('HDR', Icons.hdr_on),
+                        _buildInfoChip(_getAvailableTickets(), Icons.airplane_ticket),
                         const SizedBox(width: 16),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -348,7 +353,7 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                                     color: Colors.white, size: 22),
                                 SizedBox(width: 12),
                                 Text(
-                                  'Purchase Tickets',
+                                  'Comprar Bilhete',
                                   style: TextStyle(
                                     color: Colors.white, 
                                     fontSize: 16, 
@@ -379,7 +384,7 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text(
-                            'Synopsis',
+                            'Detalhes',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 18,
@@ -611,7 +616,7 @@ class _TicketPurchaseFormState extends State<TicketPurchaseForm>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text(
-                              'Purchase Tickets',
+                              'Comprar Bilhete',
                               style: TextStyle(
                                 color: Colors.white, 
                                 fontSize: 22, 
