@@ -3,6 +3,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:movie_app_ui/Model/model.dart';
 import 'package:movie_app_ui/event_details.dart';
+import 'package:movie_app_ui/services/api_service.dart';
 
 class MovieDisplay extends StatefulWidget {
   const MovieDisplay({super.key});
@@ -13,9 +14,13 @@ class MovieDisplay extends StatefulWidget {
 
 int current = 0;
 
+
 class _MovieDisplayState extends State<MovieDisplay> {
   Map<int, bool> hoverStates = {};
   bool isLoading = false;
+  List<dynamic> movies = [];
+  bool isLoadingMovies = false;
+  String errorMessage = '';
 
   DeviceType getDeviceType(double width) {
     if (width < 600) {
@@ -71,6 +76,26 @@ class _MovieDisplayState extends State<MovieDisplay> {
     }
   }
 
+Future<void> loadMovies() async {
+  setState(() {
+    isLoadingMovies = true;
+    errorMessage = '';
+  });
+  
+  try {
+    final events = await ApiService.getEvents();
+    setState(() {
+      movies = events;
+      isLoadingMovies = false;
+    });
+  } catch (e) {
+    setState(() {
+      errorMessage = 'Erro ao carregar eventos: $e';
+      isLoadingMovies = false;
+    });
+  }
+}
+
   void _navigateToDetails(Map<String, dynamic> movie) {
     final eventData = {
       ...movie,
@@ -99,7 +124,7 @@ class _MovieDisplayState extends State<MovieDisplay> {
             contentPadding: const EdgeInsets.all(20),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
             title: Text(
-              movie['Title'],
+              movie['title'] ?? '',
               style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w700,
@@ -126,7 +151,7 @@ class _MovieDisplayState extends State<MovieDisplay> {
                   ),
                   clipBehavior: Clip.hardEdge,
                   child: Image.network(
-                    movie['Image'],
+                    movie['poster_url'] ?? 'https://i.ibb.co/BVff3hcS/vingadores.webp',
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
@@ -138,7 +163,7 @@ class _MovieDisplayState extends State<MovieDisplay> {
                 ),
                 const SizedBox(height: 20),
                 Text(
-                  movie['Director'],
+                  movie['venues']?['name'] ?? 'Local não informado',
                   style: TextStyle(
                     color: Colors.grey[400],
                     fontSize: 15,
@@ -151,14 +176,14 @@ class _MovieDisplayState extends State<MovieDisplay> {
                     Icon(Icons.star, color: Colors.amber, size: 18),
                     const SizedBox(width: 6),
                     Text(
-                      movie['rating'],
+                      movie['rating'] ?? '',
                       style: const TextStyle(color: Colors.white, fontSize: 15),
                     ),
                     const SizedBox(width: 20),
                     Icon(Icons.access_time, color: Colors.grey[400], size: 18),
                     const SizedBox(width: 6),
                     Text(
-                      movie['duration'],
+                      movie['duration'] ?? '',
                       style: const TextStyle(color: Colors.white, fontSize: 15),
                     ),
                   ],
@@ -214,12 +239,46 @@ class _MovieDisplayState extends State<MovieDisplay> {
     );
   }
 
+@override
+void initState() {
+  super.initState();
+  loadMovies();
+}
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     final deviceType = getDeviceType(screenWidth);
     final config = getResponsiveConfig(deviceType);
+
+    if (isLoadingMovies) {
+      return Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (errorMessage.isNotEmpty) {
+  return Scaffold(
+    body: Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(errorMessage),
+          ElevatedButton(
+            onPressed: loadMovies,
+            child: Text('Tentar Novamente'),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+if (movies.isEmpty) {
+  return Scaffold(
+    body: Center(child: Text('Nenhum evento encontrado')),
+  );
+}
 
     return Scaffold(
       body: SizedBox(
@@ -238,7 +297,7 @@ class _MovieDisplayState extends State<MovieDisplay> {
               height: double.infinity,
               
               child: Image.network(
-                movies[current]['Image'],
+                movies[current]['poster_url'] ?? '',
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
                   return Container(
@@ -415,7 +474,7 @@ class _MovieDisplayState extends State<MovieDisplay> {
                                         child: Stack(
                                           children: [
                                             Image.network(
-                                              movie['Image'],
+                                              movie['poster_url'] ?? 'https://i.ibb.co/BVff3hcS/vingadores.webp',
                                               fit: BoxFit.cover,
                                               width: double.infinity,
                                               height: double.infinity,
@@ -467,7 +526,7 @@ class _MovieDisplayState extends State<MovieDisplay> {
                                           horizontal: deviceType == DeviceType.desktop ? 24 : 16,
                                         ),
                                         child: Text(
-                                          movie['Title'],
+                                          movie['title'] ?? 'Título não informado',
                                           style: TextStyle(
                                             fontSize: config.titleFontSize,
                                             fontWeight: FontWeight.bold,
@@ -486,7 +545,7 @@ class _MovieDisplayState extends State<MovieDisplay> {
                                           horizontal: deviceType == DeviceType.desktop ? 24 : 16,
                                         ),
                                         child: Text(
-                                          movie['Director'],
+                                          movie['venues']?['name'] ?? 'Local não informado',
                                           style: TextStyle(
                                             color: Colors.black87, // MUDANÇA: era Colors.black54
                                             fontWeight: FontWeight.w500,
@@ -591,13 +650,13 @@ class _MovieDisplayState extends State<MovieDisplay> {
           children: [
             _buildDetailItem(
               Icons.star,
-              movie['rating'],
+              movie['rating'] ?? '',
               Colors.amber,
               config.detailsFontSize,
             ),
             _buildDetailItem(
               Icons.access_time,
-              movie['duration'],
+              movie['duration'] ?? ' ',
               Colors.grey[600]!,
               config.detailsFontSize,
             ),
@@ -615,13 +674,13 @@ class _MovieDisplayState extends State<MovieDisplay> {
       children: [
         _buildDetailItem(
           Icons.star,
-          movie['rating'],
+          '${movie['price']} ${movie['currency'] ?? 'MZN'}',
           Colors.amber,
           config.detailsFontSize,
         ),
         _buildDetailItem(
           Icons.access_time,
-          movie['duration'],
+          _formatEventDuration(movie),
           Colors.grey[600]!,
           config.detailsFontSize,
         ),
@@ -629,6 +688,19 @@ class _MovieDisplayState extends State<MovieDisplay> {
       ],
     );
   }
+
+  String _formatEventDuration(Map<String, dynamic> event) {
+  try {
+    final start = DateTime.parse(event['start_date_time']);
+    final end = DateTime.parse(event['end_date_time']);
+    final duration = end.difference(start);
+    final hours = duration.inHours;
+    final minutes = duration.inMinutes % 60;
+    return '${hours}h${minutes}m';
+  } catch (e) {
+    return 'N/A';
+  }
+}
 
   Widget _buildDetailItem(IconData icon, String text, Color iconColor, double fontSize) {
     return Row(
@@ -671,26 +743,26 @@ class _MovieDisplayState extends State<MovieDisplay> {
           ),
         ],
       ),
-      child: ElevatedButton(
-        onPressed: () {},
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.transparent,
-          shadowColor: Colors.transparent,
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
-          ),
-        ),
-        child: Text(
-          "Buy Ticket",
-          style: TextStyle(
-            fontSize: fontSize,
-            fontWeight: FontWeight.w700,
-            color: Colors.white,
-            letterSpacing: 0.3,
-          ),
-        ),
-      ),
+      // child: ElevatedButton(
+      //   onPressed: () {},
+      //   style: ElevatedButton.styleFrom(
+      //     backgroundColor: Colors.transparent,
+      //     shadowColor: Colors.transparent,
+      //     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      //     shape: RoundedRectangleBorder(
+      //       borderRadius: BorderRadius.circular(24),
+      //     ),
+      //   ),
+      //   child: Text(
+      //     "Buy Ticket",
+      //     style: TextStyle(
+      //       fontSize: fontSize,
+      //       fontWeight: FontWeight.w700,
+      //       color: Colors.white,
+      //       letterSpacing: 0.3,
+      //     ),
+      //   ),
+      // ),
     );
   }
 }

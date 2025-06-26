@@ -32,6 +32,7 @@ migrate_working_dir/
 /build/flutter_assets
 /build/1da0e1d975ae990dcd067cec644f5fa4
 /build/cache.dill.track.dill
+/build/web
 
 # Symbolication related
 app.*.symbols
