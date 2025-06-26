@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:movie_app_ui/movie.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -16,6 +19,15 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   late Animation<double> _slideAnimation;
   late Animation<double> _floatingAnimation;
   bool _isLogin = true; 
+  // Controllers para os campos
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+
+// Estados de loading e erro
+  bool _isLoading = false;
+  String? _errorMessage;
 
   @override
   void initState() {
@@ -66,6 +78,122 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     super.dispose();
   }
 
+  Future<void> _signUp() async {
+  setState(() {
+    _isLoading = true;
+    _errorMessage = null;
+  });
+
+  // Validações básicas
+  if (_passwordController.text != _confirmPasswordController.text) {
+    setState(() {
+      _errorMessage = 'Senhas não coincidem';
+      _isLoading = false;
+    });
+    return;
+  }
+
+  try {
+    final response = await http.post(
+      Uri.parse('http://localhost:3000/api/auth/register'), // substitua SEU_IP
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({
+        'firstName': _nameController.text.split(' ').first,
+        'lastName': _nameController.text.split(' ').length > 1 ? _nameController.text.split(' ').last : '',
+        'email': _emailController.text,
+        'password': _passwordController.text,
+      }),
+    );
+
+    if (response.statusCode == 201) {
+      // Sucesso - mostrar mensagem e mudar para login
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Conta criada com sucesso! Faça login.')),
+      );
+      setState(() {
+        _isLogin = true; // muda para modo login
+      });
+    } else {
+      final error = json.decode(response.body);
+      setState(() {
+        _errorMessage = error['error'] ?? 'Erro ao criar conta';
+      });
+    }
+  } catch (e) {
+    setState(() {
+      _errorMessage = 'Erro de conexão';
+    });
+  } finally {
+    setState(() {
+      _isLoading = false;
+    });
+  }
+}
+
+Future<void> _login() async {
+  setState(() {
+    _isLoading = true;
+    _errorMessage = null;
+  });
+
+  try {
+    final response = await http.post(
+      Uri.parse('http://localhost:3000/api/auth/login'), // substitua SEU_IP
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({
+        'email': _emailController.text,
+        'password': _passwordController.text,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      
+      // Sucesso - salvar dados do usuário (opcional)
+      // Você pode usar SharedPreferences ou apenas manter em memória
+      
+      // Fechar modal e navegar
+      Navigator.pop(context);
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const MovieDisplay()),
+      );
+      
+      // Mostrar mensagem de sucesso
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Login realizado com sucesso!')),
+      );
+      
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('user_data', json.encode(data['user']));
+      await prefs.setBool('is_logged_in', true);
+    } else {
+      final error = json.decode(response.body);
+      setState(() {
+        _errorMessage = error['error'] ?? 'Email ou senha incorretos';
+      });
+    }
+  } catch (e) {
+    setState(() {
+      _errorMessage = 'Erro de conexão';
+    });
+  } finally {
+    setState(() {
+      _isLoading = false;
+    });
+  }
+}
+
+void _clearFields() {
+  _emailController.clear();
+  _passwordController.clear();
+  _confirmPasswordController.clear();
+  _nameController.clear();
+  setState(() {
+    _errorMessage = null;
+  });
+}
+
 void _showLoginModal() {
   showDialog(
     context: context,
@@ -93,7 +221,7 @@ void _showLoginModal() {
                   children: [
                     Expanded(
                       child: GestureDetector(
-                        onTap: () => setModalState(() => _isLogin = true),
+                        onTap: (){ setModalState(() => _isLogin = true); _clearFields();},
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           decoration: BoxDecoration(
@@ -113,7 +241,7 @@ void _showLoginModal() {
                     ),
                     Expanded(
                       child: GestureDetector(
-                        onTap: () => setModalState(() => _isLogin = false),
+                        onTap: () {setModalState(() => _isLogin = false); _clearFields();},
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           decoration: BoxDecoration(
@@ -140,26 +268,26 @@ void _showLoginModal() {
               // Campos do formulário
               if (_isLogin) ...[
                 // LOGIN FORM
-                _buildTextField('Enter your email', Icons.email_outlined),
+                _buildTextField('Enter your email', Icons.email_outlined, controller: _emailController),
                 const SizedBox(height: 16),
-                _buildTextField('Enter your password', Icons.visibility_off, isPassword: true),
+                _buildTextField('Enter your password', Icons.visibility_off, isPassword: true, controller: _passwordController),
                 const SizedBox(height: 12),
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
-                    onPressed: () {},
+                    onPressed: () { },
                     child: const Text('Forgot Password?', style: TextStyle(color: Colors.grey)),
                   ),
                 ),
               ] else ...[
                 // SIGN UP FORM
-                _buildTextField('User Name', Icons.person_outline),
+                _buildTextField('User Name', Icons.person_outline, controller: _nameController),
                 const SizedBox(height: 16),
-                _buildTextField('Enter your email', Icons.email_outlined),
+                _buildTextField('Enter your email', Icons.email_outlined, controller: _emailController),
                 const SizedBox(height: 16),
-                _buildTextField('Password', Icons.visibility_off, isPassword: true),
+                _buildTextField('Password', Icons.visibility_off, isPassword: true, controller: _passwordController),
                 const SizedBox(height: 16),
-                _buildTextField('Confirm Password', Icons.visibility_off, isPassword: true),
+                _buildTextField('Confirm Password', Icons.visibility_off, isPassword: true, controller: _confirmPasswordController),
                 const SizedBox(height: 16),
                 _buildTextField('Terms and Services (21 Y/o)', Icons.visibility_off, isPassword: true),
               ],
@@ -177,12 +305,17 @@ void _showLoginModal() {
                   borderRadius: BorderRadius.circular(25),
                 ),
                 child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const MovieDisplay()),
-                    );
+                  onPressed: _isLoading ? null :() {
+                    if (_isLogin) {
+                      _login();
+                    } else {
+                      _signUp();
+                    }
+                    // Navigator.pop(context);
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(builder: (context) => const MovieDisplay()),
+                    // );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.transparent,
@@ -232,6 +365,8 @@ void _showLoginModal() {
     ),
   );
 }
+ 
+ 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -711,13 +846,14 @@ void _showLoginModal() {
     );
   }
 
-  Widget _buildTextField(String hint, IconData icon, {bool isPassword = false}) {
+  Widget _buildTextField(String hint, IconData icon, {bool isPassword = false, TextEditingController? controller}) {
   return Container(
     decoration: BoxDecoration(
       color: const Color(0xFF2D2D2D),
       borderRadius: BorderRadius.circular(25),
     ),
     child: TextField(
+      controller: controller,
       obscureText: isPassword,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(

@@ -6,7 +6,7 @@ class ApiService {
   
   static Future<List<dynamic>> getEvents() async {
     final response = await http.get(
-      Uri.parse('$baseUrl/events'),
+      Uri.parse('$baseUrl/events?status=published'),
       headers: {'Content-Type': 'application/json'},
     );
     

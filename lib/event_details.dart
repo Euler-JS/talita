@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:ui';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class EventDetailsPage extends StatefulWidget {
   final Map<String, dynamic> eventData;
@@ -36,6 +38,73 @@ class _EventDetailsPageState extends State<EventDetailsPage>
     _tabController.dispose();
     _animationController.dispose();
     super.dispose();
+  }
+
+    String _getImageUrl() {
+    return widget.eventData['poster_url'] ?? 
+           'https://via.placeholder.com/400x600?text=No+Image';
+  }
+
+  String _getTitle() {
+    return widget.eventData['title'] ?? 'Event Title';
+  }
+
+  String _getDescription() {
+    return widget.eventData['description'] ?? 
+           'No description available for this event.';
+  }
+
+  String _getEventYear() {
+    try {
+      final startDate = widget.eventData['start_date_time'];
+      if (startDate != null) {
+        return DateTime.parse(startDate).year.toString();
+      }
+    } catch (e) {
+      // ignore
+    }
+    return '2024';
+  }
+
+  String _getEventGenre() {
+    return widget.eventData['type'] ?? 'Event';
+  }
+
+  String _getDuration() {
+    try {
+      final startStr = widget.eventData['start_date_time'];
+      final endStr = widget.eventData['end_date_time'];
+      
+      if (startStr != null && endStr != null) {
+        final start = DateTime.parse(startStr);
+        final end = DateTime.parse(endStr);
+        final duration = end.difference(start);
+        final hours = duration.inHours;
+        final minutes = duration.inMinutes % 60;
+        return '${hours}h ${minutes}m';
+      }
+    } catch (e) {
+      // ignore
+    }
+    return '2h 30m';
+  }
+
+  String _getRating() {
+    // Como não temos rating na API, vamos gerar baseado no preço ou usar padrão
+    final price = double.tryParse(widget.eventData['price']?.toString() ?? '0') ?? 0;
+    if (price > 100) return '9.2';
+    if (price > 50) return '8.5';
+    return '7.8';
+  }
+
+  String _getVenueName() {
+    return widget.eventData['venues']?['name'] ?? 'Venue Name';
+  }
+
+  String _getPrice() {
+    final price = widget.eventData['price']?.toString() ?? '0';
+    final currency = widget.eventData['currency'] ?? 'MT';
+    return '$currency $price';
   }
 
   @override
@@ -79,7 +148,7 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                 children: [
                   // Imagem de fundo
                   Image.network(
-                    widget.eventData['Image'] ?? '',
+                    _getImageUrl(),
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
@@ -182,7 +251,7 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                     
                     // Título melhorado
                     Text(
-                      widget.eventData['Title'] ?? 'Event Title',
+                      _getTitle(),
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 34,
@@ -217,7 +286,7 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                                   color: Color(0xFFFFD700), size: 16),
                               const SizedBox(width: 4),
                               Text(
-                                widget.eventData['rating'] ?? '8.5',
+                                _getRating(),
                                 style: const TextStyle(
                                   color: Color(0xFFFFD700), 
                                   fontSize: 14, 
@@ -234,7 +303,7 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                     
                     // Info do filme melhorada
                     Text(
-                      '${widget.eventData['year'] ?? '2024'} • ${widget.eventData['genre'] ?? 'Action / Adventure'} • ${widget.eventData['duration'] ?? '2h 30m'}',
+                      '${_getEventYear()} • ${_getEventGenre()} • ${_getDuration()}',
                       style: TextStyle(
                         color: Colors.grey[400], 
                         fontSize: 15,
@@ -318,9 +387,8 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            widget.eventData['description'] ?? 
-                            'After the death of his father, T\'Challa returns home to the African nation of Wakanda to take his rightful place as king. However, when a powerful enemy suddenly reappears, T\'Challa\'s mettle as king—and as Black Panther—gets tested.',
-                            style: TextStyle(
+                           _getDescription(),
+                           style: TextStyle(
                               color: Colors.grey[300], 
                               fontSize: 15, 
                               height: 1.6,
@@ -404,7 +472,7 @@ class _TicketPurchaseFormState extends State<TicketPurchaseForm>
   @override
   void initState() {
     super.initState();
-    _ticketPrice = double.tryParse(widget.eventData['price']?.toString() ?? '0') ?? 25.0;
+    _ticketPrice = _getEventPrice();
     
     _slideController = AnimationController(
       duration: const Duration(milliseconds: 400),
@@ -419,6 +487,7 @@ class _TicketPurchaseFormState extends State<TicketPurchaseForm>
     ));
     
     _slideController.forward();
+
   }
 
   @override
@@ -428,6 +497,45 @@ class _TicketPurchaseFormState extends State<TicketPurchaseForm>
     _notesController.dispose();
     _slideController.dispose();
     super.dispose();
+  }
+
+  Future<Map<String, dynamic>> _createBooking() async {
+    final bookingData = {
+      'event_id': widget.eventData['id'],
+      'quantity': _ticketQuantity,
+      'customer_notes': _notesController.text.trim().isNotEmpty 
+          ? _notesController.text.trim() 
+          : null,
+    };
+
+    final response = await http.post(
+      Uri.parse('http://localhost:3000/api/bookings'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: json.encode(bookingData),
+    );
+
+    if (response.statusCode == 201) {
+      return json.decode(response.body);
+    } else {
+      final error = json.decode(response.body);
+      throw Exception(error['error'] ?? 'Erro ao criar reserva');
+    }
+  }
+
+  // ADICIONAR métodos auxiliares:
+  String _getEventTitle() {
+    return widget.eventData['title'] ?? 'Event';
+  }
+
+  String _getEventId() {
+    return widget.eventData['id']?.toString() ?? '';
+  }
+
+  double _getEventPrice() {
+    return double.tryParse(widget.eventData['price']?.toString() ?? '0') ?? 25.0;
   }
 
   double get _totalPrice => _ticketQuantity * _ticketPrice;
@@ -505,7 +613,7 @@ class _TicketPurchaseFormState extends State<TicketPurchaseForm>
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              widget.eventData['Title'] ?? 'Event',
+                              _getEventTitle(),
                               style: TextStyle(
                                 color: Colors.grey[400], 
                                 fontSize: 14,
@@ -856,71 +964,162 @@ class _TicketPurchaseFormState extends State<TicketPurchaseForm>
     );
   }
 
-  void _handlePurchase() async {
-    if (!_formKey.currentState!.validate()) return;
 
-    setState(() {
-      _isLoading = true;
-    });
 
-    try {
-      final bookingData = {
-        'event_id': widget.eventData['id'],
-        'customer_name': _nameController.text.trim(),
-        'customer_phone': _phoneController.text.trim(),
-        'quantity': _ticketQuantity,
-        'total_amount': _totalPrice,
-        'customer_notes': _notesController.text.trim(),
-        'seat_numbers': List.generate(_ticketQuantity, (index) => 'seat_${index + 1}'),
-      };
+ void _handlePurchase() async {
+  if (!_formKey.currentState!.validate()) return;
 
-      await Future.delayed(const Duration(seconds: 2));
+  // Verificar se temos ID do evento
+  if (_getEventId().isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Row(
+          children: [
+            Icon(Icons.error, color: Colors.white),
+            SizedBox(width: 12),
+            Text('Erro: ID do evento não encontrado'),
+          ],
+        ),
+        backgroundColor: Colors.red[600],
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+    );
+    return;
+  }
+
+  setState(() {
+    _isLoading = true;
+  });
+
+  try {
+    final result = await _createBooking();
+    
+    if (mounted) {
+      Navigator.pop(context);
       
-      if (mounted) {
-        Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Row(
-              children: [
-                Icon(Icons.check_circle, color: Colors.white),
-                SizedBox(width: 12),
-                Text('Reserva criada com sucesso!'),
-              ],
-            ),
-            backgroundColor: Colors.green[600],
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
+      // Mostrar dialog de sucesso com detalhes da reserva
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => _buildSuccessDialog(result),
+      );
+    }
+    
+  } catch (e) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(Icons.error, color: Colors.white),
+              const SizedBox(width: 12),
+              Expanded(child: Text('Erro: ${e.toString()}')),
+            ],
           ),
-        );
-      }
-      
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(Icons.error, color: Colors.white),
-                const SizedBox(width: 12),
-                Text('Erro ao criar reserva: $e'),
-              ],
-            ),
-            backgroundColor: Colors.red[600],
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
+          backgroundColor: Colors.red[600],
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
           ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+        ),
+      );
+    }
+  } finally {
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
+}
+
+// ADICIONAR este método para o dialog de sucesso:
+Widget _buildSuccessDialog(Map<String, dynamic> booking) {
+  return AlertDialog(
+    backgroundColor: const Color(0xFF1A1A1A),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+    title: const Row(
+      children: [
+        Icon(Icons.check_circle, color: Colors.green, size: 28),
+        SizedBox(width: 12),
+        Text(
+          'Reserva Criada!',
+          style: TextStyle(color: Colors.white, fontSize: 20),
+        ),
+      ],
+    ),
+    content: Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Sua reserva foi criada com sucesso.',
+          style: TextStyle(color: Colors.grey[300], fontSize: 16),
+        ),
+        const SizedBox(height: 16),
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFF2A2A2A),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildDetailRow(
+                'Número da Reserva:', 
+                booking['booking']?['booking_number'] ?? 'N/A'
+              ),
+              const SizedBox(height: 8),
+              _buildDetailRow(
+                'Evento:', 
+                _getEventTitle()
+              ),
+              const SizedBox(height: 8),
+              _buildDetailRow(
+                'Quantidade:', 
+                '$_ticketQuantity ticket${_ticketQuantity > 1 ? 's' : ''}'
+              ),
+              const SizedBox(height: 8),
+              _buildDetailRow(
+                'Total:', 
+                'MT ${_totalPrice.toStringAsFixed(2)}'
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.of(context).pop(),
+        child: const Text(
+          'OK',
+          style: TextStyle(color: Color(0xFFE50914), fontSize: 16),
+        ),
+      ),
+    ],
+  );
+}
+
+// ADICIONAR este método auxiliar:
+Widget _buildDetailRow(String label, String value) {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+      Text(
+        label,
+        style: TextStyle(color: Colors.grey[400], fontSize: 14),
+      ),
+      Text(
+        value,
+        style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500),
+      ),
+    ],
+  );
+}
+  
 }
