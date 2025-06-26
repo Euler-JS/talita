@@ -760,52 +760,44 @@ class _MovieDisplayState extends State<MovieDisplay> {
                                                 Container(
                                                   padding: const EdgeInsets
                                                       .symmetric(
-                                                      horizontal: 16,
-                                                      vertical: 8),
+                                                      horizontal: 14,
+                                                      vertical: 6),
                                                   decoration: BoxDecoration(
                                                     gradient: LinearGradient(
                                                       colors: [
-                                                        const Color(0xFFE53E3E)
-                                                            .withOpacity(0.15),
-                                                        const Color(0xFFD53F8C)
-                                                            .withOpacity(0.15),
+                                                        const Color(0xFFE53E3E),
+                                                        const Color(0xFFDC2626),
                                                       ],
                                                     ),
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             20),
-                                                    border: Border.all(
-                                                      color: const Color(
-                                                              0xFFE53E3E)
-                                                          .withOpacity(0.3),
-                                                      width: 1.5,
-                                                    ),
                                                     boxShadow: [
                                                       BoxShadow(
                                                         color: const Color(
                                                                 0xFFE53E3E)
-                                                            .withOpacity(0.1),
-                                                        blurRadius: 8,
+                                                            .withOpacity(0.4),
+                                                        blurRadius: 12,
                                                         offset:
-                                                            const Offset(0, 2),
+                                                            const Offset(0, 4),
                                                       ),
                                                     ],
                                                   ),
                                                   child: Text(
-                                                    movie['type'] ?? ' ',
+                                                    movie['type']
+                                                            ?.toUpperCase() ??
+                                                        'EVENT',
                                                     style: TextStyle(
-                                                      color: const Color(
-                                                          0xFFE53E3E),
+                                                      color: Colors.white,
                                                       fontSize: config
                                                               .detailsFontSize -
-                                                          1,
+                                                          2,
                                                       fontWeight:
-                                                          FontWeight.w600,
-                                                      letterSpacing: 0.5,
+                                                          FontWeight.w700,
+                                                      letterSpacing: 1.2,
                                                     ),
                                                   ),
                                                 ),
-
                                                 // Movie details (rating, duration, watch)
                                                 AnimatedOpacity(
                                                   duration: const Duration(
@@ -916,8 +908,8 @@ class _MovieDisplayState extends State<MovieDisplay> {
               ),
             ],
           ),
-          // const SizedBox(height: 20),
-          // _buildWatchButton(config.detailsFontSize),
+          const SizedBox(height: 20),
+          _buildWatchButton(config.detailsFontSize),
         ],
       ),
     );
@@ -926,22 +918,33 @@ class _MovieDisplayState extends State<MovieDisplay> {
   Widget _buildMobileTabletDetails(Map<String, dynamic> movie,
       ResponsiveConfig config, DeviceType deviceType) {
     return Expanded(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Column(
         children: [
-          _buildDetailItem(
-            Icons.star,
-            '${movie['price']} ${movie['currency'] ?? 'MZN'}',
-            Colors.amber,
-            config.detailsFontSize,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _buildDetailItem(
+                Icons.attach_money,
+                '${movie['price']} ${movie['currency'] ?? 'MZN'}',
+                const Color(0xFF059669), // Verde para preço
+                config.detailsFontSize,
+              ),
+              _buildDetailItem(
+                Icons.access_time,
+                _formatEventDuration(movie),
+                Colors.blue.shade600,
+                config.detailsFontSize,
+              ),
+            ],
           ),
-          _buildDetailItem(
-            Icons.access_time,
-            _formatEventDuration(movie),
-            Colors.grey[600]!,
-            config.detailsFontSize,
-          ),
-          // _buildWatchSection(config.detailsFontSize, deviceType),
+          const SizedBox(height: 12),
+          if (movie['rating'] != null)
+            _buildDetailItem(
+              Icons.star,
+              movie['rating'].toString(),
+              Colors.amber.shade600,
+              config.detailsFontSize,
+            ),
         ],
       ),
     );
@@ -963,34 +966,45 @@ class _MovieDisplayState extends State<MovieDisplay> {
   Widget _buildDetailItem(
       IconData icon, String text, Color iconColor, double fontSize) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: iconColor.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
+        color: Colors.grey.shade100.withOpacity(0.8),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: iconColor.withOpacity(0.2),
+          color: Colors.grey.shade200,
           width: 1,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            padding: const EdgeInsets.all(4),
+            padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(6),
+              color: iconColor.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(icon, color: iconColor, size: fontSize + 2),
+            child: Icon(
+              icon,
+              color: iconColor,
+              size: fontSize,
+            ),
           ),
           const SizedBox(width: 8),
           Text(
             text,
             style: TextStyle(
               fontSize: fontSize - 1,
-              color: Colors.grey[700],
+              color: Colors.grey[800],
               fontWeight: FontWeight.w600,
-              letterSpacing: 0.2,
+              letterSpacing: 0.3,
             ),
           ),
         ],
@@ -1005,43 +1019,44 @@ class _MovieDisplayState extends State<MovieDisplay> {
     );
   }
 
-  Widget _buildWatchButton(double fontSize) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFFE53E3E), Color(0xFFD53F8C)],
-        ),
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFFE53E3E).withOpacity(0.4),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-          ),
+Widget _buildWatchButton(double fontSize) {
+  return Container(
+    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    decoration: BoxDecoration(
+      gradient: LinearGradient(
+        colors: [
+          const Color(0xFFE53E3E).withOpacity(0.1),
+          const Color(0xFFD53F8C).withOpacity(0.1),
         ],
       ),
-      // child: ElevatedButton(
-      //   onPressed: () {},
-      //   style: ElevatedButton.styleFrom(
-      //     backgroundColor: Colors.transparent,
-      //     shadowColor: Colors.transparent,
-      //     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      //     shape: RoundedRectangleBorder(
-      //       borderRadius: BorderRadius.circular(24),
-      //     ),
-      //   ),
-      //   child: Text(
-      //     "Buy Ticket",
-      //     style: TextStyle(
-      //       fontSize: fontSize,
-      //       fontWeight: FontWeight.w700,
-      //       color: Colors.white,
-      //       letterSpacing: 0.3,
-      //     ),
-      //   ),
-      // ),
-    );
-  }
+      borderRadius: BorderRadius.circular(20),
+      border: Border.all(
+        color: const Color(0xFFE53E3E).withOpacity(0.3),
+        width: 1,
+      ),
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          Icons.confirmation_number_outlined,
+          color: const Color(0xFFE53E3E),
+          size: fontSize,
+        ),
+        const SizedBox(width: 6),
+        Text(
+          "Tickets",
+          style: TextStyle(
+            fontSize: fontSize - 1,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFFE53E3E),
+            letterSpacing: 0.5,
+          ),
+        ),
+      ],
+    ),
+  );
+}
 }
 
 // Enhanced responsive configuration
