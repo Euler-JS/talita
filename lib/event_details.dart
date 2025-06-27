@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'dart:ui';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class EventDetailsPage extends StatefulWidget {
@@ -72,22 +73,18 @@ class _EventDetailsPageState extends State<EventDetailsPage>
   }
 
   String _getDuration() {
-    try {
-      final startStr = widget.eventData['start_date_time'];
-      final endStr = widget.eventData['end_date_time'];
+     try {
       
-      if (startStr != null && endStr != null) {
-        final start = DateTime.parse(startStr);
-        final end = DateTime.parse(endStr);
-        final duration = end.difference(start);
-        final hours = duration.inHours;
-        final minutes = duration.inMinutes % 60;
-        return '${hours}h ${minutes}m';
-      }
-    } catch (e) {
-      // ignore
-    }
-    return '2h 30m';
+    final start = DateTime.parse(widget.eventData['start_date_time']);
+    
+    // Formato: "04 Dez" ou "4 Dec" dependendo da localização
+    return DateFormat('d MMM', 'pt_BR').format(start);
+    // return '${start.day.toString().padLeft(2, '0')}/${start.month.toString().padLeft(2, '0')}';
+    
+  } catch (e) {
+    print(e);
+    return 'N/A';
+  }
   }
 
   String _getRating() {
@@ -241,12 +238,13 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            '${_getEventGenre()}',
+                            '${_getEventGenre().toUpperCase()}',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
                               letterSpacing: 0.5,
+                              
                             ),
                           ),
                         ],
@@ -288,11 +286,11 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.star, 
+                              const Icon(Icons.calendar_month_outlined, 
                                   color: Color(0xFFFFD700), size: 16),
                               const SizedBox(width: 4),
                               Text(
-                                _getRating(),
+                                _getDuration().toUpperCase(),
                                 style: const TextStyle(
                                   color: Color(0xFFFFD700), 
                                   fontSize: 14, 
@@ -309,7 +307,7 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                     
                     // Info do filme melhorada
                     Text(
-                      '${_getEventYear()} • ${_getEventGenre()} • ${_getDuration()}',
+                      '${_getEventYear()} • ${_getEventGenre().toUpperCase()}}',
                       style: TextStyle(
                         color: Colors.grey[400], 
                         fontSize: 15,
