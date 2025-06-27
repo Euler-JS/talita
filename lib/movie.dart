@@ -1061,7 +1061,8 @@ class _MovieDisplayState extends State<MovieDisplay> {
 
 Widget _buildWatchButton(double fontSize) {
   return Container(
-    constraints: const BoxConstraints(minWidth: 80),
+    width: double.infinity,
+    // constraints: const BoxConstraints(minWidth: 80),
     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
     decoration: BoxDecoration(
       gradient: LinearGradient(
@@ -1077,7 +1078,7 @@ Widget _buildWatchButton(double fontSize) {
       ),
     ),
     child: Row(
-      mainAxisSize: MainAxisSize.min,
+      // mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Icon(
