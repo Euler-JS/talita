@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:movie_app_ui/movie.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'dart:math' as math;
 import 'package:shared_preferences/shared_preferences.dart';
 
 
@@ -16,9 +17,14 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     with TickerProviderStateMixin {
   late AnimationController _animationController;
   late AnimationController _floatingController;
+  late AnimationController _rotationController;
+  late AnimationController _starPulseController;
   late Animation<double> _fadeAnimation;
   late Animation<double> _slideAnimation;
   late Animation<double> _floatingAnimation;
+  late Animation<double> _rotationAnimation;
+  late Animation<double> _starPulseAnimation;
+  late Animation<double> _scaleAnimation;
   bool _isLogin = true; 
   // Controllers para os campos
   final TextEditingController _emailController = TextEditingController();
@@ -35,12 +41,22 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     super.initState();
     
     _animationController = AnimationController(
-      duration: const Duration(milliseconds: 1500),
+      duration: const Duration(milliseconds: 4500),
       vsync: this,
     );
     
     _floatingController = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    );
+
+    _rotationController = AnimationController(
       duration: const Duration(seconds: 3),
+      vsync: this,
+    );
+
+    _starPulseController = AnimationController(
+      duration: const Duration(milliseconds: 800),
       vsync: this,
     );
 
@@ -49,33 +65,64 @@ class _OnboardingScreenState extends State<OnboardingScreen>
       end: 1.0,
     ).animate(CurvedAnimation(
       parent: _animationController,
-      curve: const Interval(0.0, 0.7, curve: Curves.easeOut),
+      curve: const Interval(0.0, 0.6, curve: Curves.easeOutCirc),
     ));
 
     _slideAnimation = Tween<double>(
-      begin: 50.0,
+      begin: 100.0,
       end: 0.0,
     ).animate(CurvedAnimation(
       parent: _animationController,
-      curve: const Interval(0.3, 1.0, curve: Curves.elasticOut),
+      curve: const Interval(0.2, 1.0, curve: Curves.elasticOut),
     ));
 
     _floatingAnimation = Tween<double>(
-      begin: 0.0,
-      end: 10.0,
+      begin: -25.0,
+      end: 25.0,
     ).animate(CurvedAnimation(
       parent: _floatingController,
       curve: Curves.easeInOut,
     ));
 
+    _rotationAnimation = Tween<double>(
+      begin: 0.0,
+      end: 2 * 3.14159, // Rotação completa
+    ).animate(CurvedAnimation(
+      parent: _rotationController,
+      curve: Curves.linear,
+    ));
+
+// Animação de pulsação para as estrelas
+    _starPulseAnimation = Tween<double>(
+      begin: 0.3,
+      end: 1.8,
+    ).animate(CurvedAnimation(
+      parent: _starPulseController,
+      curve: Curves.elasticInOut,
+    ));
+
+// Animação de escala para entrada dramática
+    _scaleAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: const Interval(0.0, 0.8, curve: Curves.elasticOut),
+    ));
+
     _animationController.forward();
     _floatingController.repeat(reverse: true);
+    _rotationController.repeat();
+    _starPulseController.repeat(reverse: true);
+
   }
 
   @override
   void dispose() {
     _animationController.dispose();
     _floatingController.dispose();
+    _rotationController.dispose();
+    _starPulseController.dispose();
     super.dispose();
   }
 
@@ -583,116 +630,531 @@ Container(
   }
 
   Widget _buildStars() {
-    return Stack(
-      children: [
-        Positioned(top: 50, left: 50, child: _buildStar(8)),
-        Positioned(top: 100, right: 80, child: _buildStar(6)),
-        Positioned(top: 200, left: 30, child: _buildStar(4)),
-        Positioned(top: 250, right: 40, child: _buildStar(10)),
-        Positioned(top: 350, left: 80, child: _buildStar(6)),
-        Positioned(top: 400, right: 100, child: _buildStar(8)),
-        Positioned(bottom: 100, left: 60, child: _buildStar(5)),
-        Positioned(bottom: 150, right: 50, child: _buildStar(7)),
-      ],
-    );
-  }
+  return AnimatedBuilder(
+    animation: _starPulseAnimation,
+    builder: (context, child) {
+      return Stack(
+        children: [
+          Positioned(
+            top: 50, 
+            left: 50, 
+            child: Transform.scale(
+              scale: _starPulseAnimation.value,
+              child: _buildStar(12, Colors.pink, 0.0),
+            ),
+          ),
+          Positioned(
+            top: 100, 
+            right: 80, 
+            child: Transform.scale(
+              scale: _starPulseAnimation.value * 0.8,
+              child: _buildStar(10, Colors.purple, 0.5),
+            ),
+          ),
+          Positioned(
+            top: 200, 
+            left: 30, 
+            child: Transform.scale(
+              scale: _starPulseAnimation.value * 1.1,
+              child: _buildStar(8, Colors.blue, 1.0),
+            ),
+          ),
+          Positioned(
+            top: 250, 
+            right: 40, 
+            child: Transform.scale(
+              scale: _starPulseAnimation.value * 0.9,
+              child: _buildStar(14, Colors.orange, 1.5),
+            ),
+          ),
+          Positioned(
+            top: 350, 
+            left: 80, 
+            child: Transform.scale(
+              scale: _starPulseAnimation.value,
+              child: _buildStar(10, Colors.teal, 2.0),
+            ),
+          ),
+          Positioned(
+            top: 400, 
+            right: 100, 
+            child: Transform.scale(
+              scale: _starPulseAnimation.value * 1.2,
+              child: _buildStar(12, Colors.red, 2.5),
+            ),
+          ),
+          Positioned(
+            bottom: 100, 
+            left: 60, 
+            child: Transform.scale(
+              scale: _starPulseAnimation.value * 0.7,
+              child: _buildStar(9, Colors.green, 3.0),
+            ),
+          ),
+          Positioned(
+            bottom: 150, 
+            right: 50, 
+            child: Transform.scale(
+              scale: _starPulseAnimation.value * 1.1,
+              child: _buildStar(11, Colors.amber, 3.5),
+            ),
+          ),
+        ],
+      );
+    },
+  );
+}
 
-  Widget _buildStar(double size) {
-    return FadeTransition(
-      opacity: _fadeAnimation,
-      child: Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          color: Colors.pink.withOpacity(0.6),
-          shape: BoxShape.circle,
+// Estrela melhorada com brilho
+Widget _buildStar(double size, Color color, double delay) {
+  return AnimatedBuilder(
+    animation: _fadeAnimation,
+    builder: (context, child) {
+      return FadeTransition(
+        opacity: _fadeAnimation,
+        child: Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            gradient: RadialGradient(
+              colors: [
+                color.withOpacity(0.9),
+                color.withOpacity(0.3),
+                Colors.transparent,
+              ],
+            ),
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: color.withOpacity(0.6),
+                blurRadius: 10,
+                spreadRadius: 2,
+              ),
+            ],
+          ),
+          child: Container(
+            margin: EdgeInsets.all(size * 0.3),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: color.withOpacity(0.8),
+                  blurRadius: 5,
+                ),
+              ],
+            ),
+          ),
         ),
-      ),
-    );
-  }
+      );
+    },
+  );
+}
 
-  Widget _buildCentralIllustration() {
-    return Center(
-      child: AnimatedBuilder(
-        animation: _floatingAnimation,
-        builder: (context, child) {
-          return Transform.translate(
+// Ilustração central melhorada
+Widget _buildCentralIllustration() {
+  return Center(
+    child: AnimatedBuilder(
+      animation: Listenable.merge([_floatingAnimation, _scaleAnimation]),
+      builder: (context, child) {
+        return Transform.scale(
+          scale: _scaleAnimation.value,
+          child: Transform.translate(
             offset: Offset(0, _floatingAnimation.value),
             child: FadeTransition(
               opacity: _fadeAnimation,
               child: Container(
-                width: 300,
-                height: 300,
+                width: 320, // Ligeiramente maior
+                height: 320,
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    // Base platform
+                    // Base platform com sombra melhorada
                     Positioned(
                       bottom: 20,
                       child: Container(
-                        width: 280,
-                        height: 40,
+                        width: 300,
+                        height: 50,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFD4A574),
-                          borderRadius: BorderRadius.circular(20),
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFFD4A574), Color(0xFFB8956A)],
+                          ),
+                          borderRadius: BorderRadius.circular(25),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.3),
-                              offset: const Offset(0, 10),
-                              blurRadius: 20,
+                              color: Colors.black.withOpacity(0.4),
+                              offset: const Offset(0, 15),
+                              blurRadius: 30,
+                              spreadRadius: 5,
                             ),
                           ],
                         ),
                       ),
                     ),
                     
-                    // Popcorn container
+                    // Popcorn com animação de "pop"
                     Positioned(
                       top: 30,
                       right: 40,
-                      child: _buildPopcornContainer(),
+                      child: _buildAnimatedPopcornContainer(),
                     ),
                     
-                    // Drink cup
+                    // Drink com bolhas animadas
                     Positioned(
                       top: 80,
                       left: 50,
-                      child: _buildDrinkCup(),
+                      child: _buildAnimatedDrinkCup(),
                     ),
                     
-                    // Cinema seat
+                    // Cinema seat com movimento
                     Positioned(
                       bottom: 60,
-                      child: _buildCinemaSeat(),
+                      child: _buildAnimatedCinemaSeat(),
                     ),
                     
-                    // People figures
+                    // People com movimento de aceno
                     Positioned(
                       bottom: 40,
                       left: 80,
-                      child: _buildPersonFigure(Colors.blue),
+                      child: _buildAnimatedPersonFigure(Colors.blue),
                     ),
                     Positioned(
                       bottom: 40,
                       right: 100,
-                      child: _buildPersonFigure(Colors.orange),
+                      child: _buildAnimatedPersonFigure(Colors.orange),
                     ),
                     
-                    // Cinema ticket
+                    // Cinema ticket com rotação
                     Positioned(
                       bottom: 80,
                       right: 60,
-                      child: _buildCinemaTicket(),
+                      child: _buildAnimatedCinemaTicket(),
                     ),
                   ],
                 ),
               ),
             ),
-          );
-        },
-      ),
-    );
-  }
+          ),
+        );
+      },
+    ),
+  );
+}
+
+// Popcorn animado
+Widget _buildAnimatedPopcornContainer() {
+  return AnimatedBuilder(
+    animation: _floatingController,
+    builder: (context, child) {
+      return Transform.translate(
+        offset: Offset(
+          math.sin(_floatingController.value * 2 * math.pi) * 8,
+          math.cos(_floatingController.value * 2 * math.pi) * 6,
+        ),
+        child: Container(
+          width: 90,
+          height: 110,
+          child: Stack(
+            children: [
+              // Container base
+              Positioned(
+                bottom: 0,
+                child: Container(
+                  width: 90,
+                  height: 90,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Color(0xFFFF6B6B),
+                        Color(0xFFE74C3C),
+                        Color(0xFFC0392B),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.red.withOpacity(0.5),
+                        offset: const Offset(5, 8),
+                        blurRadius: 15,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                  child: const Center(
+                    child: Text(
+                      'POP\nCORN',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        shadows: [
+                          Shadow(
+                            color: Colors.black26,
+                            offset: Offset(1, 1),
+                            blurRadius: 2,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              // Popcorn pieces animados
+              ...List.generate(5, (index) {
+                return Positioned(
+                  top: 5 + (index * 3).toDouble(),
+                  left: 15 + (index % 2 * 30).toDouble(),
+                  child: Transform.translate(
+                    offset: Offset(
+                      math.sin((_floatingController.value + index * 0.3) * 2 * math.pi) * 6,
+                      math.cos((_floatingController.value + index * 0.2) * 2 * math.pi) * 4,
+                    ),
+                    child: _buildPopcornPiece(8 + (index % 3).toDouble()),
+                  ),
+                );
+              }),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+
+// Drink animado com bolhas
+Widget _buildAnimatedDrinkCup() {
+  return AnimatedBuilder(
+    animation: _floatingController,
+    builder: (context, child) {
+      return Container(
+        width: 60,
+        height: 80,
+        child: Stack(
+          children: [
+            // Cup base
+            Positioned(
+              bottom: 0,
+              child: Container(
+                width: 60,
+                height: 70,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Color(0xFF3498DB),
+                      Color(0xFF2980B9),
+                      Color(0xFF1F4E79),
+                    ],
+                  ),
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(30),
+                    bottomRight: Radius.circular(30),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.blue.withOpacity(0.5),
+                      offset: const Offset(5, 8),
+                      blurRadius: 15,
+                      spreadRadius: 2,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            // Straw animado
+            Positioned(
+              top: 0,
+              left: 40,
+              child: Transform.rotate(
+                angle: math.sin(_floatingController.value * 2 * math.pi) * 0.3,
+                child: Container(
+                  width: 6,
+                  height: 35,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFFE74C3C), Color(0xFFC0392B)],
+                    ),
+                    borderRadius: BorderRadius.circular(3),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.red.withOpacity(0.3),
+                        blurRadius: 5,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            // Bolhas animadas
+            ...List.generate(3, (index) {
+              return Positioned(
+                bottom: 20 + (index * 15).toDouble(),
+                left: 15 + (index * 10).toDouble(),
+                child: Transform.translate(
+                  offset: Offset(
+                    0,
+                    math.sin((_floatingController.value + index * 0.5) * 2 * math.pi) * 3,
+                  ),
+                  child: Container(
+                    width: 4 + (index % 2).toDouble(),
+                    height: 4 + (index % 2).toDouble(),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.8),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+              );
+            }),
+          ],
+        ),
+      );
+    },
+  );
+}
+
+// Assento animado
+Widget _buildAnimatedCinemaSeat() {
+  return AnimatedBuilder(
+    animation: _floatingController,
+    builder: (context, child) {
+      return Transform.scale(
+        scale: 1.0 + math.sin(_floatingController.value * 2 * math.pi) * 0.05,
+        child: Container(
+          width: 70,
+          height: 50,
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xFF8E44AD),
+                Color(0xFF6A1B9A),
+                Color(0xFF4A148C),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.purple.withOpacity(0.5),
+                offset: const Offset(5, 8),
+                blurRadius: 15,
+                spreadRadius: 2,
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+
+// Pessoa animada
+Widget _buildAnimatedPersonFigure(Color color) {
+  return AnimatedBuilder(
+    animation: _floatingController,
+    builder: (context, child) {
+      return Transform.translate(
+        offset: Offset(
+          math.sin(_floatingController.value * 2 * math.pi) * 1,
+          0,
+        ),
+        child: Container(
+          width: 25,
+          height: 35,
+          child: Column(
+            children: [
+              // Head com balanço
+              Transform.rotate(
+                angle: math.sin(_floatingController.value * 2 * math.pi) * 0.1,
+                child: Container(
+                  width: 15,
+                  height: 15,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFDBB5),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 3,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 2),
+              // Body
+              Container(
+                width: 20,
+                height: 18,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [color, color.withOpacity(0.7)],
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: color.withOpacity(0.3),
+                      blurRadius: 5,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+
+// Ticket com rotação
+Widget _buildAnimatedCinemaTicket() {
+  return AnimatedBuilder(
+    animation: _rotationAnimation,
+    builder: (context, child) {
+      return Transform.rotate(
+        angle: _rotationAnimation.value * 0.1 + 0.3,
+        child: Transform.scale(
+          scale: 1.0 + math.sin(_floatingController.value * 2 * math.pi) * 0.1,
+          child: Container(
+            width: 40,
+            height: 25,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Colors.white, Color(0xFFF5F5F5)],
+              ),
+              borderRadius: BorderRadius.circular(6),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.3),
+                  offset: const Offset(3, 5),
+                  blurRadius: 10,
+                ),
+              ],
+            ),
+            child: const Center(
+              child: Text(
+                'CINEMA\nTICKET',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 7,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    },
+  );
+}
+
 
   Widget _buildPopcornContainer() {
     return Container(
