@@ -920,6 +920,25 @@ class _MovieDisplayState extends State<MovieDisplay> {
       ResponsiveConfig config, DeviceType deviceType) {
       return Column(
         children: [
+            if (MediaQuery.of(context).size.width < 350) // ✅ ADICIONE esta condição
+        Column(
+          children: [
+            _buildDetailItem(
+              Icons.attach_money,
+              '${movie['price']} ${movie['currency'] ?? 'MZN'}',
+              const Color(0xFF059669),
+              config.detailsFontSize,
+            ),
+            const SizedBox(height: 8),
+            _buildDetailItem(
+              Icons.access_time,
+              _formatEventDuration(movie),
+              Colors.blue.shade600,
+              config.detailsFontSize,
+            ),
+          ],
+        )
+        else
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -962,6 +981,7 @@ class _MovieDisplayState extends State<MovieDisplay> {
   }
 
   String _formatEventDuration(Map<String, dynamic> event) {
+    return event['start_date_time'];
     try {
       final start = DateTime.parse(event['start_date_time']);
       final end = DateTime.parse(event['end_date_time']);
