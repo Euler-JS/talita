@@ -918,8 +918,7 @@ class _MovieDisplayState extends State<MovieDisplay> {
 
   Widget _buildMobileTabletDetails(Map<String, dynamic> movie,
       ResponsiveConfig config, DeviceType deviceType) {
-    return Expanded(
-      child: Column(
+      return Column(
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -947,7 +946,6 @@ class _MovieDisplayState extends State<MovieDisplay> {
               config.detailsFontSize,
             ),
         ],
-      ),
     );
   }
 
