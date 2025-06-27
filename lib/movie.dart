@@ -466,7 +466,8 @@ class _MovieDisplayState extends State<MovieDisplay> {
                       ),
                       Expanded(
                         child: Text(
-                          movies[current]['type'] ?? '',
+                          movies[current]['type']?.toUpperCase() ??
+                                                        'EVENT',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 26,
