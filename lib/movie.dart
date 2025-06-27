@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:movie_app_ui/Model/model.dart';
 import 'package:movie_app_ui/event_details.dart';
 import 'package:movie_app_ui/screens/onboarding.dart';
@@ -230,7 +231,7 @@ class _MovieDisplayState extends State<MovieDisplay> {
                       style: const TextStyle(color: Colors.white, fontSize: 15),
                     ),
                     const SizedBox(width: 20),
-                    Icon(Icons.access_time, color: Colors.grey[400], size: 18),
+                    Icon(Icons.calendar_month_outlined, color: Colors.grey[400], size: 18),
                     const SizedBox(width: 6),
                     Text(
                       movie['duration'] ?? '',
@@ -902,7 +903,7 @@ class _MovieDisplayState extends State<MovieDisplay> {
                 config.detailsFontSize,
               ),
               _buildDetailItem(
-                Icons.access_time,
+                Icons.calendar_month_outlined,
                 movie['duration'] ?? ' ',
                 Colors.grey[600]!,
                 config.detailsFontSize,
@@ -931,7 +932,7 @@ class _MovieDisplayState extends State<MovieDisplay> {
             ),
             const SizedBox(height: 8),
             _buildDetailItem(
-              Icons.access_time,
+              Icons.calendar_month_outlined,
               _formatEventDuration(movie),
               Colors.blue.shade600,
               config.detailsFontSize,
@@ -955,7 +956,7 @@ class _MovieDisplayState extends State<MovieDisplay> {
               Flexible(
                 flex: 1,
                 child: _buildDetailItem(
-                  Icons.access_time,
+                  Icons.calendar_month_outlined,
                   _formatEventDuration(movie),
                   Colors.blue.shade600,
                   config.detailsFontSize,
@@ -981,17 +982,18 @@ class _MovieDisplayState extends State<MovieDisplay> {
   }
 
   String _formatEventDuration(Map<String, dynamic> event) {
-    return event['start_date_time'];
     try {
-      final start = DateTime.parse(event['start_date_time']);
-      final end = DateTime.parse(event['end_date_time']);
-      final duration = end.difference(start);
-      final hours = duration.inHours;
-      final minutes = duration.inMinutes % 60;
-      return '${hours}h${minutes}m';
-    } catch (e) {
-      return 'N/A';
-    }
+      
+    final start = DateTime.parse(event['start_date_time']);
+    
+    // Formato: "04 Dez" ou "4 Dec" dependendo da localização
+    return DateFormat('d MMM', 'pt_BR').format(start);
+    // return '${start.day.toString().padLeft(2, '0')}/${start.month.toString().padLeft(2, '0')}';
+    
+  } catch (e) {
+    print(e);
+    return 'N/A';
+  }
   }
 
   Widget _buildDetailItem(

@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:movie_app_ui/movie.dart';
 import 'package:movie_app_ui/screens/onboarding.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
-void main() {
+void main() async {
+   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Inicializar as localizações
+  await initializeDateFormatting('pt_BR', null);
   runApp(const MyApp());
 }
 
