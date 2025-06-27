@@ -923,28 +923,40 @@ class _MovieDisplayState extends State<MovieDisplay> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildDetailItem(
-                Icons.attach_money,
-                '${movie['price']} ${movie['currency'] ?? 'MZN'}',
-                const Color(0xFF059669), // Verde para preço
-                config.detailsFontSize,
+              Flexible(
+                flex: 1,
+                child: _buildDetailItem(
+                  Icons.attach_money,
+                  '${movie['price']} ${movie['currency'] ?? 'MZN'}',
+                  const Color(0xFF059669), // Verde para preço
+                  config.detailsFontSize,
+                ),
               ),
-              _buildDetailItem(
-                Icons.access_time,
-                _formatEventDuration(movie),
-                Colors.blue.shade600,
-                config.detailsFontSize,
+              const SizedBox(width: 8,),
+              Flexible(
+                flex: 1,
+                child: _buildDetailItem(
+                  Icons.access_time,
+                  _formatEventDuration(movie),
+                  Colors.blue.shade600,
+                  config.detailsFontSize,
+                ),
               ),
             ],
           ),
           const SizedBox(height: 12),
           if (movie['rating'] != null)
-            _buildDetailItem(
-              Icons.star,
-              movie['rating'].toString(),
-              Colors.amber.shade600,
-              config.detailsFontSize,
+            Flexible(
+              flex: 1,
+              child: _buildDetailItem(
+                Icons.star,
+                movie['rating'].toString(),
+                Colors.amber.shade600,
+                config.detailsFontSize,
+              ),
             ),
+            const SizedBox(height: 16),
+            _buildWatchButton(config.detailsFontSize),
         ],
     );
   }
@@ -964,49 +976,52 @@ class _MovieDisplayState extends State<MovieDisplay> {
 
   Widget _buildDetailItem(
       IconData icon, String text, Color iconColor, double fontSize) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade100.withOpacity(0.8),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.grey.shade200,
-          width: 1,
+    return Flexible(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade100.withOpacity(0.8),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: Colors.grey.shade200,
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(10),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: iconColor.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                icon,
+                color: iconColor,
+                size: fontSize * 0.9,
+              ),
             ),
-            child: Icon(
-              icon,
-              color: iconColor,
-              size: fontSize,
+            const SizedBox(width: 6),
+            Text(
+              text,
+              style: TextStyle(
+                fontSize: fontSize - 2,
+                color: Colors.grey[800],
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.3,
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            text,
-            style: TextStyle(
-              fontSize: fontSize - 1,
-              color: Colors.grey[800],
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.3,
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -1020,7 +1035,7 @@ class _MovieDisplayState extends State<MovieDisplay> {
 
 Widget _buildWatchButton(double fontSize) {
   return Container(
-    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
     decoration: BoxDecoration(
       gradient: LinearGradient(
         colors: [
@@ -1040,16 +1055,16 @@ Widget _buildWatchButton(double fontSize) {
         Icon(
           Icons.confirmation_number_outlined,
           color: const Color(0xFFE53E3E),
-          size: fontSize,
+          size: fontSize * 0.9,
         ),
-        const SizedBox(width: 6),
+        const SizedBox(width: 4),
         Text(
           "Tickets",
           style: TextStyle(
-            fontSize: fontSize - 1,
+            fontSize: fontSize - 2,
             fontWeight: FontWeight.w600,
             color: const Color(0xFFE53E3E),
-            letterSpacing: 0.5,
+            letterSpacing: 0.3,
           ),
         ),
       ],

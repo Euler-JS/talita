@@ -274,7 +274,7 @@ class _EventDetailsPageState extends State<EventDetailsPage>
                       children: [
                         _buildInfoChip(_getPrice(), Icons.money),
                         const SizedBox(width: 12),
-                        _buildInfoChip(_getAvailableTickets(), Icons.airplane_ticket),
+                        _buildInfoChip(_getAvailableTickets(), Icons.confirmation_number_outlined),
                         const SizedBox(width: 16),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
