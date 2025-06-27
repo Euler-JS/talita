@@ -978,10 +978,11 @@ class _MovieDisplayState extends State<MovieDisplay> {
       IconData icon, String text, Color iconColor, double fontSize) {
     return Flexible(
       child: Container(
+        constraints: const BoxConstraints(maxWidth: 160),
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
         decoration: BoxDecoration(
           color: Colors.grey.shade100.withOpacity(0.8),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: Colors.grey.shade200,
             width: 1,
@@ -989,7 +990,7 @@ class _MovieDisplayState extends State<MovieDisplay> {
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.04),
-              blurRadius: 8,
+              blurRadius: 4,
               offset: const Offset(0, 2),
             ),
           ],
@@ -998,27 +999,30 @@ class _MovieDisplayState extends State<MovieDisplay> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              padding: const EdgeInsets.all(4),
+              padding: const EdgeInsets.all(3),
               decoration: BoxDecoration(
                 color: iconColor.withOpacity(0.15),
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
                 icon,
                 color: iconColor,
-                size: fontSize * 0.9,
+                size: fontSize * 0.7,
               ),
             ),
-            const SizedBox(width: 6),
-            Text(
-              text,
-              style: TextStyle(
-                fontSize: fontSize - 2,
-                color: Colors.grey[800],
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.3,
+            const SizedBox(width: 4),
+            Expanded(
+              child: Text(
+                text,
+                style: TextStyle(
+                  fontSize: fontSize - 3,
+                  color: Colors.grey[800],
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: 0.1,
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
               ),
-              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
@@ -1035,6 +1039,7 @@ class _MovieDisplayState extends State<MovieDisplay> {
 
 Widget _buildWatchButton(double fontSize) {
   return Container(
+    constraints: const BoxConstraints(minWidth: 80),
     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
     decoration: BoxDecoration(
       gradient: LinearGradient(
@@ -1051,20 +1056,24 @@ Widget _buildWatchButton(double fontSize) {
     ),
     child: Row(
       mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Icon(
           Icons.confirmation_number_outlined,
           color: const Color(0xFFE53E3E),
-          size: fontSize * 0.9,
+          size: fontSize * 0.8,
         ),
         const SizedBox(width: 4),
-        Text(
-          "Tickets",
-          style: TextStyle(
-            fontSize: fontSize - 2,
-            fontWeight: FontWeight.w600,
-            color: const Color(0xFFE53E3E),
-            letterSpacing: 0.3,
+        Flexible(
+          child: Text(
+            "Tickets",
+            style: TextStyle(
+              fontSize: fontSize - 3,
+              fontWeight: FontWeight.w600,
+              color: const Color(0xFFE53E3E),
+              letterSpacing: 0.3,
+            ),
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ],
