@@ -126,15 +126,17 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     super.dispose();
   }
 
-  Future<void> _signUp() async {
-  setState(() {
+Future<void> _signUp([Function? updateModalState]) async {
+  final setStateCallback = updateModalState ?? setState;
+  
+  setStateCallback(() {
     _isLoading = true;
     _errorMessage = null;
   });
 
   // Validações básicas
   if (_passwordController.text != _confirmPasswordController.text) {
-    setState(() {
+    setStateCallback(() {
       _errorMessage = 'Senhas não coincidem';
       _isLoading = false;
     });
@@ -158,28 +160,30 @@ class _OnboardingScreenState extends State<OnboardingScreen>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Conta criada com sucesso! Faça login.')),
       );
-      setState(() {
+      setStateCallback(() {
         _isLogin = true; // muda para modo login
       });
     } else {
       final error = json.decode(response.body);
-      setState(() {
+      setStateCallback(() {
         _errorMessage = error['error'] ?? 'Erro ao criar conta';
       });
     }
   } catch (e) {
-    setState(() {
+    setStateCallback(() {
       _errorMessage = 'Erro de conexão';
     });
   } finally {
-    setState(() {
+    setStateCallback(() {
       _isLoading = false;
     });
   }
 }
 
-Future<void> _login() async {
-  setState(() {
+Future<void> _login([Function? updateModalState]) async {
+  final setStateCallback = updateModalState ?? setState;
+  
+  setStateCallback(() {
     _isLoading = true;
     _errorMessage = null;
   });
@@ -219,16 +223,16 @@ Future<void> _login() async {
     
     } else {
       final error = json.decode(response.body);
-      setState(() {
+      setStateCallback(() {
         _errorMessage = error['error'] ?? 'Email ou senha incorretos';
       });
     }
   } catch (e) {
-    setState(() {
+    setStateCallback(() {
       _errorMessage = 'Erro de conexão';
     });
   } finally {
-    setState(() {
+    setStateCallback(() {
       _isLoading = false;
     });
   }
@@ -464,9 +468,9 @@ Container(
   child: ElevatedButton(
     onPressed: _isLoading ? null : () {
       if (_isLogin) {
-        _login();
+        _login(setModalState); // Passa o setModalState aqui
       } else {
-        _signUp();
+        _signUp(setModalState); // Passa o setModalState aqui
       }
     },
     style: ElevatedButton.styleFrom(
