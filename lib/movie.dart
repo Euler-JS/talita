@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:movie_app_ui/Model/model.dart';
 import 'package:movie_app_ui/event_details.dart';
+import 'package:movie_app_ui/screens/bookings.dart';
 import 'package:movie_app_ui/screens/onboarding.dart';
 import 'package:movie_app_ui/services/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -425,6 +426,14 @@ class _MovieDisplayState extends State<MovieDisplay> {
                           if (value == 'logout') {
                             _logout(context);
                           }
+                          if (value == 'bookings') {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const MyBookingsScreen(),
+                              ),
+                            );
+                          }
                         },
                         icon: const Icon(Icons.menu,
                             color: Colors.white, size: 26),
@@ -441,16 +450,16 @@ class _MovieDisplayState extends State<MovieDisplay> {
                             //     ],
                             //   ),
                             // ),
-                            // const PopupMenuItem<String>(
-                            //   value: 'settings',
-                            //   child: Row(
-                            //     children: [
-                            //       Icon(Icons.settings, color: Colors.white),
-                            //       SizedBox(width: 8),
-                            //       Text('Configurações', style: TextStyle(color: Colors.white)),
-                            //     ],
-                            //   ),
-                            // ),
+                            const PopupMenuItem<String>(
+                              value: 'bookings',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.confirmation_number, color: Colors.white),
+                                  SizedBox(width: 8),
+                                  Text('Meus Tickets', style: TextStyle(color: Colors.white)),
+                                ],
+                              ),
+                            ),
                             const PopupMenuItem<String>(
                               value: 'logout',
                               child: Row(
