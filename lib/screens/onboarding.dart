@@ -997,7 +997,7 @@ Widget _buildAnimatedDrinkCup() {
                 child: Transform.translate(
                   offset: Offset(
                     0,
-                    math.sin((_floatingController.value + index * 0.5) * 2 * math.pi) * 3,
+                    math.sin((_floatingController.value + index * 0.5) * 2 * math.pi) * 8,
                   ),
                   child: Container(
                     width: 4 + (index % 2).toDouble(),
@@ -1023,7 +1023,7 @@ Widget _buildAnimatedCinemaSeat() {
     animation: _floatingController,
     builder: (context, child) {
       return Transform.scale(
-        scale: 1.0 + math.sin(_floatingController.value * 2 * math.pi) * 0.05,
+        scale: 1.0 + math.sin(_floatingController.value * 2 * math.pi) * 0.15,
         child: Container(
           width: 70,
           height: 50,
@@ -1060,7 +1060,7 @@ Widget _buildAnimatedPersonFigure(Color color) {
     builder: (context, child) {
       return Transform.translate(
         offset: Offset(
-          math.sin(_floatingController.value * 2 * math.pi) * 1,
+          math.sin(_floatingController.value * 2 * math.pi) * 4,
           0,
         ),
         child: Container(
@@ -1070,7 +1070,7 @@ Widget _buildAnimatedPersonFigure(Color color) {
             children: [
               // Head com balanço
               Transform.rotate(
-                angle: math.sin(_floatingController.value * 2 * math.pi) * 0.1,
+                angle: math.sin(_floatingController.value * 2 * math.pi) * 0.4,
                 child: Container(
                   width: 15,
                   height: 15,
