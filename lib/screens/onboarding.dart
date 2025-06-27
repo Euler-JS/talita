@@ -593,7 +593,7 @@ Container(
                         ),
                         const SizedBox(height: 40),
                         const Text(
-                          'TEATRO,JOGOS, SHOWS...!',
+                          'CINEMA,JOGOS, WORKSHOPS...!',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 18,
