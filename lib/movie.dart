@@ -120,7 +120,7 @@ class _MovieDisplayState extends State<MovieDisplay> {
     try {
       // Fazer logout no backend
       final response = await http.post(
-        Uri.parse('http://localhost:3000/api/auth/logout'), // substitua SEU_IP
+        Uri.parse('https://tickets-events-swart.vercel.app/api/auth/logout'), // substitua SEU_IP
         headers: {'Content-Type': 'application/json'},
       );
 

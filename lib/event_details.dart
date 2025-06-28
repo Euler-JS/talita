@@ -519,7 +519,7 @@ class _TicketPurchaseFormState extends State<TicketPurchaseForm>
     };
 
     final response = await http.post(
-      Uri.parse('http://localhost:3000/api/bookings'),
+      Uri.parse('https://tickets-events-swart.vercel.app/api/bookings'),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',

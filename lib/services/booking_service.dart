@@ -5,7 +5,7 @@ import 'package:movie_app_ui/Model/booking.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class BookingService {
-  static const String baseUrl = 'http://localhost:3000/api';
+  static const String baseUrl = 'https://tickets-events-swart.vercel.app/api';
   
   // Método para obter dados do usuário
   Future<Map<String, dynamic>?> _getUserData() async {

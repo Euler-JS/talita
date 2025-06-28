@@ -145,7 +145,7 @@ Future<void> _signUp([Function? updateModalState]) async {
 
   try {
     final response = await http.post(
-      Uri.parse('http://localhost:3000/api/auth/register'), // substitua SEU_IP
+      Uri.parse('https://tickets-events-swart.vercel.app/api/auth/register'), // substitua SEU_IP
       headers: {'Content-Type': 'application/json'},
       body: json.encode({
         'firstName': _nameController.text.split(' ').first,
@@ -190,7 +190,7 @@ Future<void> _login([Function? updateModalState]) async {
 
   try {
     final response = await http.post(
-      Uri.parse('http://localhost:3000/api/auth/login'), // substitua SEU_IP
+      Uri.parse('https://tickets-events-swart.vercel.app/api/auth/login'), // substitua SEU_IP
       headers: {'Content-Type': 'application/json'},
       body: json.encode({
         'email': _emailController.text,
